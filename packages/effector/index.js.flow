@@ -20,16 +20,26 @@ export type Subscription = {
 export interface Unit<T> {
   /*::+*/ kind: kind;
 }
-declare export class Event<Payload> implements Unit<Payload> {
-  (payload: Payload): Payload;
+declare export class ComputedEvent<Payload> implements Unit<Payload> {
   /*::+*/ kind: kind;
   watch(watcher: (payload: Payload) => any): Subscription;
-  map<T>(fn: (_: Payload) => T): Event<T>;
-  filter<T>(fn: (_: Payload) => T | void): Event<T>;
+  map<T>(fn: (_: Payload) => T): ComputedEvent<T>;
+  filter<T>(fn: (_: Payload) => T | void): ComputedEvent<T>;
   prepend<Before>(fn: (_: Before) => Payload): Event<Before>;
   subscribe(subscriber: Subscriber<Payload>): Subscription;
   getType(): string;
 }
+declare export class Event<Payload> implements Unit<Payload> {
+  (payload: Payload): Payload;
+  /*::+*/ kind: kind;
+  watch(watcher: (payload: Payload) => any): Subscription;
+  map<T>(fn: (_: Payload) => T): ComputedEvent<T>;
+  filter<T>(fn: (_: Payload) => T | void): ComputedEvent<T>;
+  prepend<Before>(fn: (_: Before) => Payload): Event<Before>;
+  subscribe(subscriber: Subscriber<Payload>): Subscription;
+  getType(): string;
+}
+export type EventLike<T> = ComputedEvent<T> | Event<T>
 
 declare export class Future<Params, Done, Fail> extends Promise<Done> {
   /*::+*/ args: Params;
@@ -41,11 +51,11 @@ declare export class Effect<Params, Done, Fail = Error>
   implements Unit<Params> {
   (payload: Params): Future<Params, Done, Fail>;
   /*::+*/ kind: kind;
-  /*::+*/ done: Event<{|
+  /*::+*/ done: ComputedEvent<{|
     params: Params,
     result: Done,
   |}>;
-  /*::+*/ fail: Event<{|
+  /*::+*/ fail: ComputedEvent<{|
     params: Params,
     error: Fail,
   |}>;
@@ -60,11 +70,11 @@ declare export class Effect<Params, Done, Fail = Error>
   getType(): string;
 }
 
-declare export class Computed<State> implements Unit<State> {
+declare export class ComputedStore<State> implements Unit<State> {
   /*::+*/ kind: kind;
   getState(): State;
-  map<T>(fn: (_: State, lastState?: T) => T, _: void): Computed<T>;
-  map<T>(fn: (_: State, lastState: T) => T, firstState: T): Computed<T>;
+  map<T>(fn: (_: State, lastState?: T) => T, _: void): ComputedStore<T>;
+  map<T>(fn: (_: State, lastState: T) => T, firstState: T): ComputedStore<T>;
   subscribe(listener: any): Subscription;
   watch<E>(
     watcher: (state: State, payload: E, type: string) => any,
@@ -82,8 +92,8 @@ declare export class Computed<State> implements Unit<State> {
 declare export class Store<State> implements Unit<State> {
   /*::+*/ kind: kind;
   getState(): State;
-  map<T>(fn: (_: State, lastState?: T) => T, _: void): Computed<T>;
-  map<T>(fn: (_: State, lastState: T) => T, firstState: T): Computed<T>;
+  map<T>(fn: (_: State, lastState?: T) => T, _: void): ComputedStore<T>;
+  map<T>(fn: (_: State, lastState: T) => T, firstState: T): ComputedStore<T>;
   reset(trigger: Unit<any>): this;
   on<E>(
     trigger: Unit<E>,
@@ -103,8 +113,7 @@ declare export class Store<State> implements Unit<State> {
   shortName: string;
   defaultState: State;
 }
-
-export type StoreLike<T> = Computed<T> | Store<T>
+export type StoreLike<T> = ComputedStore<T> | Store<T>
 
 declare export class Domain {
   onCreateEvent(hook: (newEvent: Event<mixed>) => any): Subscription;
@@ -155,7 +164,7 @@ declare export function relay<T, Arg>(opts: {|
   |},
 |}): Subscription
 
-declare export function createEvent<E>(eventName?: string): Event<E>
+declare export function createEvent<Payload>(eventName?: string): Event<Payload>
 
 declare export function createEffect<Params, Done, Fail>(
   effectName?: string,
@@ -172,7 +181,7 @@ declare export function createStoreObject<
   State: {+[key: string]: StoreLike<any> | any, ...},
 >(
   obj: State,
-): Computed<
+): ComputedStore<
   $ObjMap<
     State,
     //prettier-ignore
@@ -185,11 +194,11 @@ declare export function extract<
 >(
   store: StoreLike<State>,
   extractor: (_: State) => NextState,
-): Computed<
+): ComputedStore<
   $ObjMap<
     NextState,
     //prettier-ignore
-    <S>(field: Store<S> | S) => S,
+    <S>(field: StoreLike<S> | S) => S,
   >,
 >
 declare export function createApi<
@@ -206,52 +215,54 @@ declare export function restoreObject<
 ): $ObjMap<
   State,
   //prettier-ignore
-  <S>(field: Store<S> | S) => Store<S>,
+  & (<S>(field: Store<S> | S) => Store<S>)
+  & (<S>(field: ComputedStore<S>) => ComputedStore<S>),
 >
 
 declare export function restoreEffect<Done>(
   effect: Effect<any, Done, any>,
   defaultState: Done,
-): Computed<Done>
+): ComputedStore<Done>
 
 declare export function restoreEvent<Payload>(
-  event: Event<Payload>,
+  event: EventLike<Payload>,
   defaultState: Payload,
-): Computed<Payload>
+): ComputedStore<Payload>
 
 declare export function restore<Done>(
   effect: Effect<any, Done, any>,
   defaultState: Done,
-): Computed<Done>
-declare export function restore<E>(event: Event<E>, defaultState: E): Computed<E>
+): ComputedStore<Done>
+declare export function restore<Payload>(event: EventLike<Payload>, defaultState: Payload): ComputedStore<Payload>
 declare export function restore<State: {+[key: string]: StoreLike<any> | any, ...}>(
   state: State,
 ): $ObjMap<
   State,
   //prettier-ignore
-  <S>(field: Store<S> | S) => Store<S>,
+  & (<S>(field: Store<S> | S) => Store<S>)
+  & (<S>(field: ComputedStore<S>) => ComputedStore<S>),
 >
 declare export function createDomain(domainName?: string): Domain
-declare export function combine<R>(fn: () => R): Computed<R>
-declare export function combine<A, R>(a: Store<A>, fn: (a: A) => R): Computed<R>
+declare export function combine<R>(fn: () => R): ComputedStore<R>
+declare export function combine<A, R>(a: Store<A>, fn: (a: A) => R): ComputedStore<R>
 declare export function combine<A, B, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
   fn: (a: A, b: B) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
   c: StoreLike<C>,
   fn: (a: A, b: B, c: C) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
   c: StoreLike<C>,
   d: StoreLike<D>,
   fn: (a: A, b: B, c: C, d: D) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, E, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
@@ -259,7 +270,7 @@ declare export function combine<A, B, C, D, E, R>(
   d: StoreLike<D>,
   e: StoreLike<E>,
   fn: (a: A, b: B, c: C, d: D, e: E) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, E, F, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
@@ -268,7 +279,7 @@ declare export function combine<A, B, C, D, E, F, R>(
   e: StoreLike<E>,
   f: StoreLike<F>,
   fn: (a: A, b: B, c: C, d: D, e: E, f: F) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, E, F, G, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
@@ -278,7 +289,7 @@ declare export function combine<A, B, C, D, E, F, G, R>(
   f: StoreLike<F>,
   g: StoreLike<G>,
   fn: (a: A, b: B, c: C, d: D, e: E, f: F, g: G) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, E, F, G, H, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
@@ -289,7 +300,7 @@ declare export function combine<A, B, C, D, E, F, G, H, R>(
   g: StoreLike<G>,
   h: StoreLike<H>,
   fn: (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, E, F, G, H, I, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
@@ -301,7 +312,7 @@ declare export function combine<A, B, C, D, E, F, G, H, I, R>(
   h: StoreLike<H>,
   i: StoreLike<I>,
   fn: (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, E, F, G, H, I, J, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
@@ -314,7 +325,7 @@ declare export function combine<A, B, C, D, E, F, G, H, I, J, R>(
   i: StoreLike<I>,
   j: StoreLike<J>,
   fn: (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J) => R,
-): Computed<R>
+): ComputedStore<R>
 declare export function combine<A, B, C, D, E, F, G, H, I, J, K, R>(
   a: StoreLike<A>,
   b: StoreLike<B>,
@@ -328,4 +339,4 @@ declare export function combine<A, B, C, D, E, F, G, H, I, J, K, R>(
   j: StoreLike<J>,
   k: StoreLike<K>,
   fn: (a: A, b: B, c: C, d: D, e: E, f: F, g: G, h: H, i: I, j: J, k: K) => R,
-): Computed<R>
+): ComputedStore<R>
