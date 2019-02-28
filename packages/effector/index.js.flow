@@ -115,6 +115,22 @@ declare export class Store<State> implements Unit<State> {
 }
 export type StoreLike<T> = ComputedStore<T> | Store<T>
 
+declare export function isUnit(obj: mixed): boolean %checks(typeof obj ===
+  'object' &&
+  obj !== null &&
+  (obj instanceof Event || obj instanceof ComputedEvent || obj instanceof Store || obj instanceof ComputedStore || obj instanceof Effect))
+declare export function isStore(obj: mixed): boolean %checks(typeof obj ===
+  'object' &&
+  obj !== null &&
+  obj instanceof Store || obj instanceof ComputedStore)
+declare export function isEvent(obj: mixed): boolean %checks(typeof obj ===
+  'object' &&
+  obj !== null &&
+  obj instanceof Event || obj instanceof ComputedEvent)
+declare export function isEffect(obj: mixed): boolean %checks(typeof obj ===
+  'object' &&
+  obj !== null &&
+  obj instanceof Effect)
 declare export class Domain {
   onCreateEvent(hook: (newEvent: Event<mixed>) => any): Subscription;
   onCreateEffect(
