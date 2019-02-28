@@ -26,8 +26,8 @@ export interface Unit<T> {
 
 export interface ComputedEvent<Payload> extends Unit<Payload> {
   watch(watcher: (payload: Payload) => any): Subscription
-  map<T>(fn: (_: Payload) => T): Event<T>
-  filter<T>(fn: (_: Payload) => T | void): Event<T>
+  map<T>(fn: (_: Payload) => T): ComputedEvent<T>
+  filter<T>(fn: (_: Payload) => T | void): ComputedEvent<T>
   prepend<Before>(fn: (_: Before) => Payload): Event<Before>
   subscribe(subscriber: Subscriber<Payload>): Subscription
   getType(): string
