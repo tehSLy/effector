@@ -7,7 +7,8 @@ import {
   createDomain,
   Store,
   Event,
-  Computed,
+  ComputedStore,
+  ComputedEvent
   /*::type*/ kind,
   forward,
   relay,
@@ -15,7 +16,18 @@ import {
 } from 'effector'
 
 test('Event', () => {
-  test('createEvent', () => {})
+  test('createEvent', () => {
+    const event1: Event<number> = createEvent()
+  })
+  test('#map',  () => {
+    const event: Event<number> = createEvent()
+    const computed = event.map(() => 'foo')
+    
+    const check1: ComputedEvent<string> = computed
+    const check2: ComputedEvent<number> = computed
+    event(2)
+    computed('')
+  })
 })
 
 test('Effect', () => {
@@ -70,9 +82,9 @@ test('Store', () => {
     const store = createStore(0)
     const computed = store.map(() => 'hello')
 
-    const check1: Computed<string> = computed
+    const check1: ComputedStore<string> = computed
     // @ts-ignore
-    const check2: Computed<number> = computed
+    const check2: ComputedStore<number> = computed
   })
 
   test('#reset', () => {
