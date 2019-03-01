@@ -3,7 +3,7 @@ export type kind =
   | 'event'
   | 'effect'
 
-declare export const Kind: {
+export const Kind: {
   readonly store: 'store',
   readonly event: 'event',
   readonly effect: 'effect',
@@ -22,6 +22,7 @@ export type Subscription = {
 
 export interface Unit<T> {
   readonly kind: kind;
+  readonly __: T;
 }
 
 export interface ComputedEvent<Payload> extends Unit<Payload> {
@@ -68,15 +69,13 @@ export interface Effect<Params, Done, Fail = Error> extends Unit<Params> {
   getType(): string
 }
 
-export class ComputedStore<State> implements Unit<State> {
-  readonly kind: kind;
+export interface ComputedStore<State> extends Unit<State> {
   getState(): State;
   map<T>(fn: (_: State, lastState?: T) => T, _: void): ComputedStore<T>;
   map<T>(fn: (_: State, lastState: T) => T, firstState: T): ComputedStore<T>;
   subscribe(listener: any): Subscription;
   watch<E>(
-    watcher: (state: State, payload: E, type: string) => any,
-    __: void,
+    watcher: (state: State, payload: undefined, type: string) => any,
   ): Subscription;
   watch<E>(
     trigger: Unit<E>,
@@ -87,8 +86,7 @@ export class ComputedStore<State> implements Unit<State> {
   defaultState: State;
 }
 
-export class Store<State> implements Unit<State> {
-  readonly kind: kind
+export interface Store<State> extends Unit<State> {
   reset(trigger: Unit<any>): this
   getState(): State
   map<T>(fn: (_: State, lastState?: T) => T): ComputedStore<T>
@@ -100,7 +98,7 @@ export class Store<State> implements Unit<State> {
   off(trigger: Unit<any>): void
   subscribe(listener: any): Subscription
   watch<E>(
-    watcher: (state: State, payload: E, type: string) => any,
+    watcher: (state: State, payload: undefined, type: string) => any,
   ): Subscription
   watch<E>(
     trigger: Unit<E>,
@@ -129,6 +127,33 @@ export class Domain {
 export function forward<T>(opts: {
   from: Unit<T>
   to: Unit<T>
+}): Subscription
+export function relayShape<
+  E,
+  O extends {[field: string]: Unit<any>},
+  F extends {[K in keyof O]: O[K] extends Unit<infer T> ? T : any},
+>(opts: {
+  from: Unit<E>,
+  shape: O,
+  query(data: E): Partial<F>,
+}): Subscription
+export function relay<T, Arg>(
+  from: Unit<T>,
+  query: (
+    data: T,
+  ) => {
+    arg: Arg,
+    list: Array<Unit<Arg> | null>,
+  },
+): Subscription
+export function relay<T, Arg>(opts: {
+  from: Unit<T>,
+  query(
+    data: T,
+  ): {
+    arg: Arg,
+    list: Array<Unit<Arg> | null>,
+  },
 }): Subscription
 
 export function createEvent<Payload>(eventName?: string): Event<Payload>
