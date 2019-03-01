@@ -23,6 +23,7 @@ const projects = [
   'babel',
   'DataStructures',
   'perf',
+  'types',
 ]
 module.exports = {
   collectCoverage: boolean(process.env.COVERAGE, true),
