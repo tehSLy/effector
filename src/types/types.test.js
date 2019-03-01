@@ -18,7 +18,7 @@ import {
   relayShape,
 } from 'effector'
 
-test('Event', () => {
+describe('Event', () => {
   test('createEvent', () => {
     const event1: Event<number> = createEvent()
   })
@@ -33,13 +33,13 @@ test('Event', () => {
   })
 })
 
-test('Effect', () => {
+describe('Effect', () => {
   test('createEffect', () => {
     const effect1: Effect<number, string> = createEffect()
   })
 })
 
-test('Store', () => {
+describe('Store', () => {
   test('createStore', () => {
     const store1: Store<number> = createStore(0)
     const store2: Store<string> = createStore(0)
@@ -171,7 +171,7 @@ test('Store', () => {
   })
 })
 
-test('Domain', () => {
+describe('Domain', () => {
   test('createDomain', () => {
     const domain = createDomain()
     const domain2 = createDomain('hello')
@@ -180,7 +180,7 @@ test('Domain', () => {
   })
 })
 
-test('Graph', () => {
+describe('Graph', () => {
   test('forward', () => {
 
   })
