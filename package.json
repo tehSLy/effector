@@ -8,7 +8,7 @@
     "docs": "docsify serve .",
     "build:bs": "bsb -make-world",
     "server": "micro",
-    "test": "npx jest --config=jest.config.js",
+    "test": "npx jest --config=jest.config.js; cd src/types && ./run-tests.sh",
     "bench": "node --expose-gc bench/bench.test.js",
     "perfsnake": "npx parcel serve --no-hmr --no-autoinstall tools/perfsnake/index.html",
     "prepublish:all": "npm run build",
