@@ -3,26 +3,29 @@
 import {
   createStore,
   createEvent,
+  createEffect,
   createStoreObject,
   createDomain,
+  combine,
+  Effect,
   Store,
   Event,
   ComputedStore,
-  ComputedEvent
+  ComputedEvent,
   /*::type*/ kind,
   forward,
   relay,
-  relayShape
+  relayShape,
 } from 'effector'
 
 test('Event', () => {
   test('createEvent', () => {
     const event1: Event<number> = createEvent()
   })
-  test('#map',  () => {
+  test('#map', () => {
     const event: Event<number> = createEvent()
     const computed = event.map(() => 'foo')
-    
+
     const check1: ComputedEvent<string> = computed
     const check2: ComputedEvent<number> = computed
     event(2)
@@ -31,13 +34,14 @@ test('Event', () => {
 })
 
 test('Effect', () => {
-  test('createEffect', () => {})
+  test('createEffect', () => {
+    const effect1: Effect<number, string> = createEffect()
+  })
 })
 
 test('Store', () => {
   test('createStore', () => {
     const store1: Store<number> = createStore(0)
-    // @ts-ignore
     const store2: Store<string> = createStore(0)
   })
   test('createStoreObject', () => {
@@ -45,17 +49,22 @@ test('Store', () => {
     const a = createStore('')
     const b = createStore(0)
     const c = createStoreObject({a, b})
-    // @ts-ignore
     c.on(ev, (state, payload) => state)
-    // @ts-ignore
     c.reset(ev)
-    // @ts-ignore
     c.off(ev)
   })
   test('createApi', () => {})
   test('setStoreName', () => {})
   test('extract', () => {})
-  test('combine', () => {})
+  test('combine', () => {
+    const ev = createEvent()
+    const a = createStore('')
+    const b = createStore(0)
+    const c = combine(a, b, (a, b) => a + b)
+    c.on(ev, (state, payload) => state)
+    c.reset(ev)
+    c.off(ev)
+  })
   test('restore', () => {})
 
   test('#(properties)', () => {
@@ -83,7 +92,7 @@ test('Store', () => {
     const computed = store.map(() => 'hello')
 
     const check1: ComputedStore<string> = computed
-    // @ts-ignore
+    
     const check2: ComputedStore<number> = computed
   })
 
@@ -92,7 +101,7 @@ test('Store', () => {
     const store = createStore(0)
     store.reset(event)
     const computed = store.map(() => 'hello')
-    // @ts-ignore
+    
     computed.reset(event)
   })
 
@@ -101,7 +110,7 @@ test('Store', () => {
     const store = createStore(0)
     store.on(event, (state, payload) => state)
     const computed = store.map(() => 'hello')
-    // @ts-ignore
+    
     computed.on(event, (state, payload) => state)
   })
 
@@ -110,7 +119,7 @@ test('Store', () => {
     const store = createStore(0)
     store.off(event)
     const computed = store.map(() => 'hello')
-    // @ts-ignore
+    
     computed.off(event)
   })
 
@@ -155,8 +164,8 @@ test('Store', () => {
     })
 
     const computed = store.map(() => 'hello')
-    const result1 = computed.thru(store => {      
-      const check: Computed<string> = store
+    const result1 = computed.thru(store => {
+      const check: ComputedStore<string> = store
       return check
     })
   })
@@ -166,9 +175,7 @@ test('Domain', () => {
   test('createDomain', () => {
     const domain = createDomain()
     const domain2 = createDomain('hello')
-    // @ts-ignore
     const domain3 = createDomain(234)
-    // @ts-ignore
     const domain4 = createDomain({foo: true})
   })
 })
