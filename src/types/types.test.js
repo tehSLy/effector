@@ -127,10 +127,10 @@ describe('Store', () => {
     const event = createEvent()
     const store = createStore(0)
     // @ts-ignore I don't know type
-    store.subscribe()
+    store.subscribe(() => {})
     const computed = store.map(() => 'hello')
     // @ts-ignore I don't know type
-    computed.subscribe()
+    computed.subscribe(() => {})
   })
 
   test('#watch', () => {
