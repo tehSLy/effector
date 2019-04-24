@@ -2,7 +2,6 @@
 import $$observable from 'symbol-observable'
 
 import {step, createGraph, Kind, createStateRef} from 'effector/stdlib'
-import {createEvent} from 'effector/event'
 
 import type {Store, ThisStore} from './index.h'
 import type {StoreConfigPart as ConfigPart} from '../config'
@@ -15,10 +14,9 @@ import {
   observable,
   watch,
   subscribe,
-  thru,
-  dispatch,
   mapStore,
 } from './storeMethods'
+import {launch} from 'effector/kernel'
 
 export function storeFabric<State>(props: {
   currentState: State,
@@ -32,7 +30,6 @@ export function storeFabric<State>(props: {
   const defaultState = currentState
   const compositeName = createName(currentId, parent)
 
-  const updater: any = createEvent('update ' + currentId)
   const storeInstance: ThisStore = {
     graphite: createGraph({
       scope: {state: plainState, oldState: currentState},
@@ -81,19 +78,11 @@ export function storeFabric<State>(props: {
   ;(store: any).on = on.bind(store, storeInstance)
   ;(store: any).defaultState = defaultState
   ;(store: any).map = mapStore.bind(storeFabric, store)
-  ;(store: any).thru = thru.bind(store)
-  ;(store: any).dispatch = dispatch.bind(null)
   //$off
   store[$$observable] = observable.bind(null, storeInstance)
-  store.on(updater, (_, payload) => payload)
 
-  function setState(value, reduce?: Function) {
-    const currentReducer =
-      typeof reduce === 'function' ? reduce : (_, payload) => payload
-    const state = getState(storeInstance)
-    const newResult = currentReducer(state, value)
-
-    updater(newResult)
+  function setState(value) {
+    launch(store, value)
   }
 
   return store
