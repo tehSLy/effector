@@ -5,7 +5,6 @@ import {step, createGraph, readRef, writeRef} from 'effector/stdlib'
 import {filterChanged, noop} from 'effector/blocks'
 
 import invariant from 'invariant'
-import {startPhaseTimer, stopPhaseTimer} from 'effector/perf'
 import {getDisplayName} from '../naming'
 import {forward, type Event} from 'effector/event'
 import type {Store, ThisStore} from './index.h'
@@ -101,17 +100,13 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
     typeof listener === 'function',
     'Expected the listener to be a function',
   )
-  let stopPhaseTimerMessage = 'Got initial error'
   let lastCall = getState(storeInstance)
 
-  startPhaseTimer(storeInstance, 'subscribe')
   try {
     listener(lastCall)
-    stopPhaseTimerMessage = 'Initial'
   } catch (err) {
     console.error(err)
   }
-  stopPhaseTimer(stopPhaseTimerMessage)
   return forward({
     from: storeInstance,
     to: createGraph({
@@ -119,10 +114,7 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
         noop,
         step.run({
           fn(args) {
-            let stopPhaseTimerMessage = null
-            startPhaseTimer(storeInstance, 'subscribe')
             if (args === lastCall) {
-              stopPhaseTimer(stopPhaseTimerMessage)
               return
             }
             lastCall = args
@@ -130,9 +122,7 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
               listener(args)
             } catch (err) {
               console.error(err)
-              stopPhaseTimerMessage = 'Got error'
             }
-            stopPhaseTimer(stopPhaseTimerMessage)
           },
         }),
       ],
@@ -145,16 +135,12 @@ export function mapStore<A, B>(
   fn: (state: A, lastState?: B) => B,
   firstState?: B,
 ): Store<B> {
-  startPhaseTimer(store, 'map')
   let lastResult
-  let stopPhaseTimerMessage = 'Got initial error'
   try {
     lastResult = fn(store.getState(), firstState)
-    stopPhaseTimerMessage = 'Initial'
   } catch (err) {
     console.error(err)
   }
-  stopPhaseTimer(stopPhaseTimerMessage)
   const innerStore: Store<any> = this({
     config: {name: '' + store.shortName + ' → *'},
     currentState: lastResult,
@@ -168,16 +154,12 @@ export function mapStore<A, B>(
       node: [
         step.compute({
           fn(newValue, {state, store, handler}) {
-            startPhaseTimer(store, 'map')
-            let stopPhaseTimerMessage = 'Got error'
             let result
             try {
               result = handler(newValue, readRef(state))
-              stopPhaseTimerMessage = null
             } catch (err) {
               console.error(err)
             }
-            stopPhaseTimer(stopPhaseTimerMessage)
             return result
           },
         }),
