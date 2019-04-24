@@ -61,32 +61,27 @@ test('event.map(fn)', () => {
   expect(spy.mock.calls).toEqual([[[undefined]], [[1]], [[2]]])
 })
 
-test('event.filter should infer type', () => {
+test('event.filter should filter values', () => {
   const spy = jest.fn()
-  const num: Event<number | '-1'> = createEvent('number')
+  const num: Event<number> = createEvent('number')
 
-  const evenNum = num.filter(n => {
-    if (n !== '-1') return n
-  })
+  const evenNum = num.filter(n => n !== -1)
 
   evenNum.watch(spy)
 
   num(0)
-  num('-1')
+  num(-1)
   num(2)
-  num('-1')
+  num(-1)
   num(4)
-  ;(evenNum: Event<number>) //Should not fail
 
   expect(spy.mock.calls).toEqual([[0], [2], [4]])
 })
 
-test('event.filter should drop undefined values', () => {
+test('event.filter use case', () => {
   const spy = jest.fn()
   const num: Event<number> = createEvent('number')
-  const evenNum = num.filter(n => {
-    if (n % 2 === 0) return n * 2
-  })
+  const evenNum = num.filter(n => n % 2 === 0)
 
   evenNum.watch(spy)
 
@@ -96,7 +91,7 @@ test('event.filter should drop undefined values', () => {
   num(3)
   num(4)
 
-  expect(spy.mock.calls).toEqual([[0], [4], [8]])
+  expect(spy.mock.calls).toEqual([[0], [2], [4]])
 
   expect(show(num.graphite)).toMatchSnapshot('num event graph')
   expect(show(evenNum.graphite)).toMatchSnapshot('evenNum event graph')

@@ -109,10 +109,7 @@ function mapEvent<A, B>(event: Event<A> | Effect<A, any, any>, fn: A => B) {
   return mapped
 }
 
-function filterEvent<A, B>(
-  event: Event<A> | Effect<A, any, any>,
-  fn: A => B | void,
-): Event<B> {
+function filterEvent<A>(event: Unit, fn: A => boolean): Event<A> {
   const mapped = eventFabric({
     name: '' + event.shortName + ' →? *',
     parent: event.domainName,
@@ -123,9 +120,8 @@ function filterEvent<A, B>(
       scope: {handler: fn},
       child: [mapped],
       node: [
-        updateHandler,
         step.filter({
-          fn: upd => upd !== undefined,
+          fn: (upd, {handler}) => !!handler(upd),
         }),
       ],
     }),
