@@ -31,16 +31,7 @@ export {Kind, clearNode, createGraph as createNode, step} from 'effector/stdlib'
 export {launch} from 'effector/kernel'
 export type {kind} from 'effector/stdlib'
 
-export {
-  invariant,
-  warning,
-  isUnit,
-  isStore,
-  isEvent,
-  isEffect,
-  isDomain,
-  is,
-} from 'effector/validate'
+export {invariant, warning, is} from 'effector/validate'
 export {version} from 'effector/flags'
 
 //eslint-disable-next-line
