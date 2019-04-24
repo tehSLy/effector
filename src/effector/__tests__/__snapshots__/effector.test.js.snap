@@ -66,12 +66,12 @@ Object {
     Array [
       2,
       10,
-      "add",
+      undefined,
     ],
     Array [
       2,
       2,
-      "add",
+      undefined,
     ],
   ],
   "state": 2,
@@ -79,7 +79,7 @@ Object {
     Array [
       3,
       1,
-      "sub",
+      undefined,
     ],
   ],
   "watch": Array [

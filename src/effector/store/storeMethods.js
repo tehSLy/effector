@@ -5,7 +5,6 @@ import {step, createGraph, readRef, writeRef} from 'effector/stdlib'
 import {filterChanged, noop} from 'effector/blocks'
 
 import invariant from 'invariant'
-import {getDisplayName} from '../naming'
 import {forward, type Event} from 'effector/event'
 import type {Store, ThisStore} from './index.h'
 import type {Subscriber} from '../index.h'
@@ -32,16 +31,15 @@ export function on(storeInstance: ThisStore, event: any, handler: Function) {
     forward({
       from,
       to: createGraph({
-        scope: {handler, state: storeInstance.plainState, trigger: from},
+        scope: {handler, state: storeInstance.plainState},
         child: [storeInstance],
         //prettier-ignore
         node: [
           step.compute({
-            fn(newValue, {handler, state, trigger}) {
+            fn(upd, {handler, state}) {
               const result = handler(
                 readRef(state),
-                newValue,
-                getDisplayName(trigger),
+                upd,
               )
               if (result === undefined) return
               return writeRef(state, result)
@@ -88,7 +86,7 @@ export function watch(
       invariant(typeof fn === 'function', message)
       return eventOrFn.watch(payload =>
         //$todo
-        fn(getState(storeInstance), payload, getDisplayName(eventOrFn)),
+        fn(getState(storeInstance), payload),
       )
     default:
       invariant(typeof eventOrFn === 'function', message)
