@@ -13,7 +13,7 @@ import type {
   Barrier,
   Tap,
 } from 'effector/stdlib'
-import {getGraph, writeRef} from 'effector/stdlib'
+import {getGraph, writeRef, tryRun} from 'effector/stdlib'
 import {__CANARY__} from 'effector/flags'
 
 import {getPriority} from './getPriority'
@@ -261,12 +261,8 @@ const command = {
       val: meta.val,
       fn: step.fn,
     })
-    /**
-     * .isFailed assignment is not needed because in such case
-     * runCtx.result will be null
-     * thereby successfully forcing that branch to stop
-     */
-    local.isChanged = Boolean(runCtx.result)
+    local.isFailed = runCtx.err
+    local.isChanged = !runCtx.err && !!runCtx.result
     return local.arg
   },
   run(meta, local, step: $PropertyType<Run, 'data'>) {
@@ -299,17 +295,4 @@ const command = {
     local.isFailed = runCtx.err
     return local.arg
   },
-}
-const tryRun = ctx => {
-  const result = {
-    err: false,
-    result: null,
-  }
-  try {
-    result.result = ctx.fn.call(null, ctx.arg, ctx.val)
-  } catch (err) {
-    console.error(err)
-    result.err = true
-  }
-  return result
 }

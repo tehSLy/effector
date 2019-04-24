@@ -101,12 +101,7 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
     'Expected the listener to be a function',
   )
   let lastCall = getState(storeInstance)
-
-  try {
-    listener(lastCall)
-  } catch (err) {
-    console.error(err)
-  }
+  tryRun(listener, lastCall)
   return forward({
     from: storeInstance,
     to: createGraph({
@@ -128,17 +123,9 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
   })
 }
 
-export function mapStore<A, B>(
-  store: Store<A>,
-  fn: (state: A, lastState?: B) => B,
-  firstState?: B,
-): Store<B> {
-  let lastResult
-  try {
-    lastResult = fn(store.getState(), firstState)
-  } catch (err) {
-    console.error(err)
-  }
+export function mapStore<A, B>(store: Store<A>, fn: (state: A) => B): Store<B> {
+  //$todo
+  const lastResult = tryRun(fn, store.getState())
   const innerStore: Store<any> = this({
     config: {name: '' + store.shortName + ' → *'},
     currentState: lastResult,
@@ -148,14 +135,22 @@ export function mapStore<A, B>(
     from: store,
     to: createGraph({
       child: [innerStore],
-      scope: {handler: fn, state: innerStore.stateRef},
+      scope: {handler: fn},
       node: [
         step.compute({
-          fn: (upd, {state, handler}) => handler(upd, readRef(state)),
+          fn: (upd, {handler}) => handler(upd),
         }),
         filterChanged,
       ],
     }),
   })
   return innerStore
+}
+
+const tryRun = (fn, ...args) => {
+  try {
+    return fn(...args)
+  } catch (error) {
+    console.error(error)
+  }
 }
