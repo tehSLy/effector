@@ -110,19 +110,17 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
   return forward({
     from: storeInstance,
     to: createGraph({
+      scope: {listener},
       node: [
         noop,
         step.run({
-          fn(args) {
+          fn(args, {listener}) {
+            //TODO seems pointless
             if (args === lastCall) {
               return
             }
             lastCall = args
-            try {
-              listener(args)
-            } catch (err) {
-              console.error(err)
-            }
+            listener(args)
           },
         }),
       ],
@@ -150,18 +148,10 @@ export function mapStore<A, B>(
     from: store,
     to: createGraph({
       child: [innerStore],
-      scope: {store, handler: fn, state: innerStore.stateRef},
+      scope: {handler: fn, state: innerStore.stateRef},
       node: [
         step.compute({
-          fn(newValue, {state, store, handler}) {
-            let result
-            try {
-              result = handler(newValue, readRef(state))
-            } catch (err) {
-              console.error(err)
-            }
-            return result
-          },
+          fn: (upd, {state, handler}) => handler(upd, readRef(state)),
         }),
         filterChanged,
       ],
