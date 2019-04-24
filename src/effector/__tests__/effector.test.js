@@ -8,21 +8,8 @@ import {createDomain} from 'effector/domain'
 import {createEvent, fromObservable} from 'effector/event'
 import {createStore, createStoreObject} from 'effector/store'
 
-import {spy, getSpyCalls} from 'effector/fixtures'
-
-describe('fixtures works correctly', () => {
-  test('spy use', () => {
-    spy()
-    spy()
-    expect(spy).toHaveBeenCalledTimes(2)
-  })
-  test('spy reuse', () => {
-    spy()
-    expect(spy).toHaveBeenCalledTimes(1)
-  })
-})
-
 test('will run in expected order', () => {
+  const spy = jest.fn()
   const reset = createEvent('reset')
   const add = createEvent('add')
   const mult = createEvent('mult')
@@ -48,7 +35,7 @@ test('will run in expected order', () => {
   unsub()
   // halt()
 
-  expect(getSpyCalls()).toEqual([[[]], [[{add: 5}]], [[{add: 5}, {mult: 4}]]])
+  expect(spy.mock.calls).toEqual([[[]], [[{add: 5}]], [[{add: 5}, {mult: 4}]]])
   expect(spy).toHaveBeenCalledTimes(3)
 })
 
@@ -79,6 +66,7 @@ test('reducer defaults', () => {
 })
 
 test('store.reset(event)', () => {
+  const spy = jest.fn()
   const reset = createEvent('reset')
   const inc = createEvent('inc')
   const listSize = createStore(3)
@@ -98,11 +86,12 @@ test('store.reset(event)', () => {
   reset()
   unsub()
 
-  expect(getSpyCalls()).toEqual([[[0, 1, 2]], [[0, 1, 2, 3]], [[0, 1, 2]]])
+  expect(spy.mock.calls).toEqual([[[0, 1, 2]], [[0, 1, 2, 3]], [[0, 1, 2]]])
   expect(spy).toHaveBeenCalledTimes(3)
 })
 
 test('combine', () => {
+  const spy = jest.fn()
   const inc = createEvent('inc')
   const dec = createEvent('dec')
   const s1 = createStore(0)
@@ -119,7 +108,7 @@ test('combine', () => {
   inc()
   dec()
   expect(result.getState()).toMatchObject({a: -9, b: 9, c: 0, d: 0})
-  console.log(result.getState(), getSpyCalls())
+  console.log(result.getState(), spy.mock.calls)
 
   expect(spy).toHaveBeenCalledTimes(3)
   // expect(fn).toHaveBeenCalledTimes(5)
@@ -198,6 +187,7 @@ describe('port', () => {
 })
 
 it('works with most use cases', async() => {
+  const spy = jest.fn()
   const timeout = createEvent('timeout')
   timeout.watch(spy)
 
@@ -286,6 +276,7 @@ test('typeConstant', async() => {
 })
 */
 test('subscription', async() => {
+  const spy = jest.fn()
   const domain = createDomain()
 
   const eff = domain.effect('TYPE_CONST')

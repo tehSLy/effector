@@ -6,10 +6,9 @@ import {createEvent} from 'effector/event'
 import {createStore} from 'effector/store'
 import {createEffect} from 'effector/effect'
 
-import {spy, getSpyCalls} from 'effector/fixtures'
-
 describe('sample', () => {
   test('store', () => {
+    const spy = jest.fn()
     const inc = createEvent('inc')
     const dec = createEvent('dec')
     const stop = createEvent('stop')
@@ -28,11 +27,12 @@ describe('sample', () => {
 
     stop()
 
-    expect(getSpyCalls()).toEqual([[0], [2]])
+    expect(spy.mock.calls).toEqual([[0], [2]])
     expect(spy).toHaveBeenCalledTimes(2)
   })
 
   test('event', () => {
+    const spy = jest.fn()
     const data = createEvent('data')
     const stop = createEvent('stop')
 
@@ -47,11 +47,12 @@ describe('sample', () => {
 
     stop()
 
-    expect(getSpyCalls()).toEqual([[{x: 'baz'}]])
+    expect(spy.mock.calls).toEqual([[{x: 'baz'}]])
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
   test('effect', () => {
+    const spy = jest.fn()
     const data = createEffect('data', {
       handler() {
         return 'resolved'
@@ -70,7 +71,7 @@ describe('sample', () => {
 
     stop()
 
-    expect(getSpyCalls()).toEqual([[{x: 'baz'}]])
+    expect(spy.mock.calls).toEqual([[{x: 'baz'}]])
     expect(spy).toHaveBeenCalledTimes(1)
   })
 })

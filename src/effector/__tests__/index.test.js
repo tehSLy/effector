@@ -6,8 +6,6 @@ import {combine} from '../combine'
 import {createStoreObject, createStore, type Store} from 'effector/store'
 import {show} from 'effector/fixtures/showstep'
 
-import {spy} from 'effector/fixtures'
-
 test('graphite', () => {
   const fn = jest.fn()
   const fn1 = jest.fn()
@@ -49,6 +47,7 @@ test('graphite', () => {
 })
 
 test('showcase', () => {
+  const spy = jest.fn()
   const foo = createEvent('foo')
   const bar = createEvent('bar')
 

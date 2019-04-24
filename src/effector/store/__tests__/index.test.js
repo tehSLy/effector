@@ -1,15 +1,15 @@
 //@flow
 
-import {createStore, createApi, restore, createStoreObject} from '..'
+import {createStore} from '..'
 import {createEvent} from 'effector/event'
 import {createEffect} from 'effector/effect'
-import {spy, getSpyCalls} from 'effector/fixtures'
 
 test('createStore', () => {
   expect(() => createStore(undefined)).toThrowErrorMatchingSnapshot()
 })
 
 test('.map', () => {
+  const spy = jest.fn()
   const newWord = createEvent/*:: <string> */()
   const a = createStore('word').on(newWord, (_, word) => word)
 
@@ -44,6 +44,7 @@ test('.map', () => {
 
 describe('.watch', () => {
   it('supports functions', () => {
+    const spy = jest.fn()
     const newWord = createEvent/*:: <string> */()
     const a = createStore('word').on(newWord, (_, word) => word)
 
@@ -64,6 +65,7 @@ describe('.watch', () => {
     expect(spy).toHaveBeenCalledTimes(3)
   })
   it('returns unsubscribe function', () => {
+    const spy = jest.fn()
     const newWord = createEvent/*:: <string> */()
     const a = createStore('word').on(newWord, (_, word) => word)
 
@@ -79,7 +81,7 @@ describe('.watch', () => {
     newWord('lol')
 
     newWord('long word [1]')
-    console.log(getSpyCalls())
+    console.log(spy.mock.calls)
     expect(spy).toHaveBeenCalledTimes(3)
 
     unsub()
@@ -88,6 +90,7 @@ describe('.watch', () => {
     expect(spy).toHaveBeenCalledTimes(3)
   })
   it('supports events', () => {
+    const spy = jest.fn()
     const newWord = createEvent/*:: <string> */('new word')
     const spyEvent = createEvent('spy event')
     const a = createStore('word').on(newWord, (_, word) => word)
@@ -112,9 +115,10 @@ describe('.watch', () => {
     spyEvent(3)
     newWord('long word')
     expect(spy).toHaveBeenCalledTimes(3)
-    expect(getSpyCalls()).toEqual([[7, 1], [7, 2], [8, 3]])
+    expect(spy.mock.calls).toEqual([[7, 1], [7, 2], [8, 3]])
   })
   it('supports effects', () => {
+    const spy = jest.fn()
     const newWord = createEvent/*:: <string> */('new word')
     const spyEvent = createEffect('spy effect')
     spyEvent.use(args => (console.log(args), args))
@@ -140,11 +144,12 @@ describe('.watch', () => {
     spyEvent(3)
     newWord('long word')
     expect(spy).toHaveBeenCalledTimes(3)
-    expect(getSpyCalls()).toEqual([[7, 1], [7, 2], [8, 3]])
+    expect(spy.mock.calls).toEqual([[7, 1], [7, 2], [8, 3]])
   })
 })
 
 test('.off', () => {
+  const spy = jest.fn()
   const newWord = createEvent/*:: <string> */()
   const a = createStore('word').on(newWord, (_, word) => word)
 

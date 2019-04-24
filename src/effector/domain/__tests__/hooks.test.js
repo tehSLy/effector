@@ -3,9 +3,9 @@
 import {createDomain} from '..'
 import {createEvent} from 'effector/event'
 import {createEffect} from 'effector/effect'
-import {spy} from 'effector/fixtures'
 
 test('domain.onCreateEvent(fn)', () => {
+  const spy = jest.fn()
   const dom = createDomain()
   dom.event()
   const unsub = dom.onCreateEvent(e => spy(e))
@@ -25,6 +25,7 @@ test('domain.onCreateEvent(fn)', () => {
 })
 
 test('domain.onCreateEffect(fn)', () => {
+  const spy = jest.fn()
   const dom = createDomain()
   dom.effect()
   const unsub = dom.onCreateEffect(e => spy(e))

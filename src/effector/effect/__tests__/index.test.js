@@ -1,12 +1,14 @@
 //@flow
 import {createEffect} from '..'
 import {forward} from 'effector/event'
-import {delay, spy} from 'effector/fixtures'
 
 const effect = createEffect('long request')
 
+const delay = n => new Promise(rs => setTimeout(rs, n))
+
 describe('effect({...})', () => {
   test(`if used function will resolve`, async() => {
+    const spy = jest.fn()
     effect.use(async params => {
       await delay(500)
       spy(params)
@@ -16,6 +18,7 @@ describe('effect({...})', () => {
   })
 
   test('if used function will throw', async() => {
+    const spy = jest.fn()
     effect.use(async params => {
       await delay(500)
       spy(params)
@@ -28,6 +31,7 @@ describe('effect({...})', () => {
 
 describe('future', () => {
   test(`if used function will resolve`, async() => {
+    const spy = jest.fn()
     effect.use(async params => {
       await delay(500)
       spy(params)
@@ -37,6 +41,7 @@ describe('future', () => {
   })
 
   test('if used function will throw', async() => {
+    const spy = jest.fn()
     effect.use(async params => {
       await delay(500)
       spy(params)
@@ -48,6 +53,7 @@ describe('future', () => {
 
 describe('effect({..}).anyway() aka .finally()', () => {
   test(`if used function will resolve`, async() => {
+    const spy = jest.fn()
     effect.use(async params => {
       await delay(500)
       spy(params)
@@ -58,6 +64,7 @@ describe('effect({..}).anyway() aka .finally()', () => {
   })
 
   test('if used function will throw', async() => {
+    const spy = jest.fn()
     effect.use(async params => {
       await delay(500)
       spy(params)
@@ -74,6 +81,7 @@ describe('createEffect with config', () => {
     await expect(effect('ok')).resolves.toBe(undefined)
   })
   it('supports default handler with config', async() => {
+    const spy = jest.fn()
     const effect = createEffect('long request', {
       async handler(params) {
         await delay(500)

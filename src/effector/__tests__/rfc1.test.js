@@ -6,10 +6,9 @@ import {createStore, createStoreObject, withProps} from 'effector/store'
 import {createEvent, type Event} from 'effector/event'
 import {createEffect} from 'effector/effect'
 
-import {spy, delay, getSpyCalls} from 'effector/fixtures'
-
 describe('symbol-observable support', () => {
   test('from(store)', async() => {
+    const spy = jest.fn()
     expect(() => {
       from(createStore(0))
     }).not.toThrow()
@@ -24,12 +23,13 @@ describe('symbol-observable support', () => {
     ev1('baz')
     ev2('should ignore')
 
-    expect(getSpyCalls()).toEqual([[-1], [0], [1], [2]])
+    expect(spy.mock.calls).toEqual([[-1], [0], [1], [2]])
     expect(spy).toHaveBeenCalledTimes(4)
     expect(store1.getState()).toBe(2)
   })
   describe('from(effect)', () => {
     test('without implementation', async() => {
+      const spy = jest.fn()
       expect(() => {
         from(createEffect('ev1'))
       }).not.toThrow()
@@ -43,10 +43,11 @@ describe('symbol-observable support', () => {
       ev2('should ignore')
       expect(spy).toHaveBeenCalledTimes(3)
 
-      expect(getSpyCalls()).toEqual([[0], [1], [2]])
+      expect(spy.mock.calls).toEqual([[0], [1], [2]])
     })
 
     test('with implementation', async() => {
+      const spy = jest.fn()
       expect(() => {
         async function impl() {}
         const eff1 = createEffect('ev1')
@@ -65,7 +66,7 @@ describe('symbol-observable support', () => {
       ev2('should ignore')
       expect(spy).toHaveBeenCalledTimes(3)
 
-      expect(getSpyCalls()).toEqual([[0], [1], [2]])
+      expect(spy.mock.calls).toEqual([[0], [1], [2]])
     })
   })
 })
@@ -139,6 +140,7 @@ describe('store.on', () => {
     expect(store.getState()).toMatchObject({counter: 0, text: '', foo: 'baz'})
   })
   test('store.on(effect)', async() => {
+    const spy = jest.fn()
     const counter = createStore(0)
     const text = createStore('')
     const store = createStoreObject({counter, text, foo: 0})
@@ -231,7 +233,7 @@ test('rfc1 example implementation', async() => {
   click$.observe(() => console.count('click$.watch'))
   click$.observe(async() => {
     console.log('tap -> watch')
-    await delay(500)
+    await new Promise(rs => setTimeout(rs, 500))
     console.log(`tap -> watch -> fnClick & increment`)
     fnClick()
     increment()

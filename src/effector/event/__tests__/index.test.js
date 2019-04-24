@@ -3,12 +3,11 @@
 import {from} from 'most'
 import {createEvent, type Event} from '..'
 
-import {getSpyCalls, spy} from 'effector/fixtures'
-
 import {show} from 'effector/fixtures/showstep'
 
 describe('symbol-observable support', () => {
   test('most.from(event) //stream of events', () => {
+    const spy = jest.fn()
     expect(() => {
       from(createEvent(''))
     }).not.toThrow()
@@ -27,16 +26,18 @@ describe('symbol-observable support', () => {
 })
 
 test('event.watch(fn)', () => {
+  const spy = jest.fn()
   const click = createEvent('click')
   click.watch(spy)
   click()
   click(1)
   click(2)
   expect(spy).toHaveBeenCalledTimes(3)
-  expect(getSpyCalls()).toEqual([[undefined], [1], [2]])
+  expect(spy.mock.calls).toEqual([[undefined], [1], [2]])
 })
 
 test('event.prepend(fn)', () => {
+  const spy = jest.fn()
   const click = createEvent('click')
   const preclick = click.prepend(([n]) => n)
   click.watch(spy)
@@ -45,10 +46,11 @@ test('event.prepend(fn)', () => {
   preclick([2])
 
   expect(spy).toHaveBeenCalledTimes(3)
-  expect(getSpyCalls()).toEqual([[undefined], [1], [2]])
+  expect(spy.mock.calls).toEqual([[undefined], [1], [2]])
 })
 
 test('event.map(fn)', () => {
+  const spy = jest.fn()
   const click = createEvent('click')
   const postclick = click.map(n => [n])
   postclick.watch(spy)
@@ -56,10 +58,11 @@ test('event.map(fn)', () => {
   click(1)
   click(2)
   expect(spy).toHaveBeenCalledTimes(3)
-  expect(getSpyCalls()).toEqual([[[undefined]], [[1]], [[2]]])
+  expect(spy.mock.calls).toEqual([[[undefined]], [[1]], [[2]]])
 })
 
 test('event.filter should infer type', () => {
+  const spy = jest.fn()
   const num: Event<number | '-1'> = createEvent('number')
 
   const evenNum = num.filter(n => {
@@ -75,10 +78,11 @@ test('event.filter should infer type', () => {
   num(4)
   ;(evenNum: Event<number>) //Should not fail
 
-  expect(getSpyCalls()).toEqual([[0], [2], [4]])
+  expect(spy.mock.calls).toEqual([[0], [2], [4]])
 })
 
 test('event.filter should drop undefined values', () => {
+  const spy = jest.fn()
   const num: Event<number> = createEvent('number')
   const evenNum = num.filter(n => {
     if (n % 2 === 0) return n * 2
@@ -92,7 +96,7 @@ test('event.filter should drop undefined values', () => {
   num(3)
   num(4)
 
-  expect(getSpyCalls()).toEqual([[0], [4], [8]])
+  expect(spy.mock.calls).toEqual([[0], [4], [8]])
 
   expect(show(num.graphite)).toMatchSnapshot('num event graph')
   expect(show(evenNum.graphite)).toMatchSnapshot('evenNum event graph')

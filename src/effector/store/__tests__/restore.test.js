@@ -8,7 +8,6 @@ import {
 } from 'effector/store'
 import {createEvent} from 'effector/event'
 import {createEffect, type Effect} from 'effector/effect'
-import {spy} from 'effector/fixtures'
 
 describe('separate functions', () => {
   test('restore object', () => {
@@ -30,6 +29,7 @@ describe('separate functions', () => {
   })
 
   test('restore effect', async() => {
+    const spy = jest.fn()
     const fx: Effect<string, number, string> = createEffect('fx1')
     fx.use(text => text.length)
     const shape = restoreEffect(fx, -1)
@@ -66,6 +66,7 @@ describe('single function', () => {
   })
 
   test('restore effect', async() => {
+    const spy = jest.fn()
     const fx: Effect<string, number, string> = createEffect('fx1')
     fx.use(text => text.length)
     const shape = restore(fx, -1)

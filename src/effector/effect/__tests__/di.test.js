@@ -2,7 +2,8 @@
 
 import {createEffect} from '..'
 import type {FnEffect} from '../index.h'
-import {delay} from 'effector/fixtures'
+
+const delay = n => new Promise(rs => setTimeout(rs, n))
 
 test('effect.create single argument', async() => {
   const effect = createEffect('long request')

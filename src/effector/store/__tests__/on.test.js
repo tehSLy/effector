@@ -1,10 +1,10 @@
 //@flow
 
-import {spy, getSpyCalls} from 'effector/fixtures'
 import {createEvent} from 'effector/event'
 import {createStore} from '..'
 
 it('supports stores', () => {
+  const spy = jest.fn()
   const newWord = createEvent<string>('new word')
   const a = createStore('word').on(newWord, (_, word) => word)
 
@@ -25,7 +25,7 @@ it('supports stores', () => {
 
   newWord('long word')
   expect(spy).toHaveBeenCalledTimes(4)
-  expect(getSpyCalls()).toEqual([
+  expect(spy.mock.calls).toEqual([
     [['word'], 'lol'],
     [['word', 'lol'], ''],
     [['word', 'lol', ''], ' '],
@@ -33,6 +33,7 @@ it('supports stores', () => {
   ])
 })
 it('supports events', () => {
+  const spy = jest.fn()
   const trigger = createEvent('trigger')
 
   const b = createStore(0)
@@ -52,7 +53,7 @@ it('supports events', () => {
 
   trigger('long word')
   expect(spy).toHaveBeenCalledTimes(4)
-  expect(getSpyCalls()).toEqual([
+  expect(spy.mock.calls).toEqual([
     [0, 'lol'],
     [1, ''],
     [2, ' '],
@@ -79,6 +80,7 @@ it('replace old links', () => {
   expect(store.getState()).toBe('x')
 })
 // it('supports effects', () => {
+//   const spy = jest.fn()
 //   const newWord = createEvent<string>('new word')
 //   const spyEvent = createEffect('spy effect')
 //   spyEvent.use(args => (console.log(args), args))
@@ -104,5 +106,5 @@ it('replace old links', () => {
 //   spyEvent(3)
 //   newWord('long word')
 //   expect(spy).toHaveBeenCalledTimes(3)
-//   expect(getSpyCalls()).toEqual([[7, 1], [7, 2], [8, 3]])
+//   expect(spy.mock.calls).toEqual([[7, 1], [7, 2], [8, 3]])
 // })
