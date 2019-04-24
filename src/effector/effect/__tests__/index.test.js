@@ -110,14 +110,12 @@ it('should support forward', async() => {
   const logRequest = createEffect('log', {
     async handler(payload) {
       fnHandler(payload)
-      console.warn('logRequest', payload)
       return 'logRequest result'
     },
   })
 
   logRequest.done.watch(d => {
     fnWatcher(d)
-    console.log(d)
   })
 
   forward({

@@ -1,6 +1,6 @@
 //@flow
-import * as fs from 'fs-extra'
-import {resolve} from 'path'
+// import * as fs from 'fs-extra'
+// import {resolve} from 'path'
 import {createEvent, forward} from 'effector/event'
 import {createStore} from '..'
 import {combine} from '../../combine'
@@ -69,7 +69,6 @@ test('olympic', async() => {
   const H = combine(G, E, (text, stats) => `${text} ${stats}`)
   const I = H.map(result => result)
   I.watch(result => {
-    console.log(result)
     fn(result)
   })
   forward({
@@ -89,8 +88,8 @@ test('olympic', async() => {
     ['text: "end" length: 3 empty: false'],
   ])
 
-  const path = resolve(__dirname, '../../..', 'tools/viz/src', 'out.json')
-  await fs.outputJSON(path, A.graphite.seq, {spaces: 2})
+  // const path = resolve(__dirname, '../../..', 'tools/viz/src', 'out.json')
+  // await fs.outputJSON(path, A.graphite.seq, {spaces: 2})
 })
 
 test('display name', () => {
@@ -143,21 +142,20 @@ test('display name', () => {
   expect(displayName.getState()).toBe('Joseph Doe')
   expect(isFirstNameShortMap.mock.calls.length).toBe(2)
   expect(fullNameMap.mock.calls.length).toBe(2)
-  console.log(displayNameMap.mock.calls)
   expect(displayNameMap.mock.calls.length).toBe(2)
   expect(view.mock.calls.length).toBe(2)
 
   updateFirstName('Jooooooooooooooseph')
-  console.log('displayNameMap.mock.calls')
-  console.table(
-    displayNameMap.mock.calls.map(
-      ([firstName, isFirstNameShort, fullName]) => ({
-        firstName,
-        isFirstNameShort,
-        fullName,
-      }),
-    ),
-  )
+  // console.log('displayNameMap.mock.calls')
+  // console.table(
+  //   displayNameMap.mock.calls.map(
+  //     ([firstName, isFirstNameShort, fullName]) => ({
+  //       firstName,
+  //       isFirstNameShort,
+  //       fullName,
+  //     }),
+  //   ),
+  // )
   expect(displayName.getState()).toBe('Jooooooooooooooseph')
   expect(isFirstNameShortMap.mock.calls.length).toBe(3)
   expect(fullNameMap.mock.calls.length).toBe(3)

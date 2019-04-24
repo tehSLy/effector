@@ -23,5 +23,3 @@ const component = {
 }
 
 const vm = new Vue(component).$mount()
-
-console.error(vm)

@@ -16,7 +16,7 @@ test('list', () => {
     acc.push(list)
   })
   acc.watch(done, lists => {
-    console.log(lists.map(list => list.join(' ')).join(`\n`))
+    // console.log(lists.map(list => list.join(' ')).join(`\n`))
   })
 
   list.add([

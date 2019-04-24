@@ -1,8 +1,7 @@
 //@flow
 import faker from 'faker'
-//$todo
-import prettyHrtime from 'pretty-hrtime'
-import {singleton, insert, rank, iterate, type leftist} from '../leftist'
+// import prettyHrtime from 'pretty-hrtime'
+import {singleton, insert, iterate, type leftist} from '../leftist'
 class Cmd {
   static id = 0
   id = ++Cmd.id
@@ -47,9 +46,9 @@ test('it works', () => {
   const oneTree = insert(new Cmd('lock', 'bar'), zeroTree, cmdGreaterThan)
   const twoTree = insert(new Cmd('effect', 'baz'), oneTree, cmdGreaterThan)
   const threeTree = insert(new Cmd('lock', 'bar'), twoTree, cmdGreaterThan)
-  console.log(rank(threeTree), threeTree)
+  // console.log(rank(threeTree), threeTree)
 
-  console.table((iterate(threeTree, cmdGreaterThan): any))
+  // console.table((iterate(threeTree, cmdGreaterThan): any))
 })
 test('stress', () => {
   const AMOUNT = 100
@@ -58,7 +57,7 @@ test('stress', () => {
   const names = Array.from({length: AMOUNT}, () =>
     faker.random.arrayElement(namesSet),
   )
-  console.log(new Set(names).size)
+  // console.log(new Set(names).size)
   const types = Array.from(
     {length: AMOUNT},
     (): 'pure' | 'lock' | 'effect' => {
@@ -76,10 +75,10 @@ test('stress', () => {
     tree = insert(cmds[i], tree, cmdGreaterThan)
   }
   const order = iterate(tree, cmdGreaterThan)
-  const totalTime = process.hrtime(time)
-  console.log(prettyHrtime(totalTime, {verbose: true}))
+  // const totalTime = process.hrtime(time)
+  // console.log(prettyHrtime(totalTime, {verbose: true}))
   expect(order).toMatchSnapshot()
   expect(tree).toMatchSnapshot()
 
-  console.table((order: any))
+  // console.table((order: any))
 })

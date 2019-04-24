@@ -8,7 +8,7 @@ import {useStore} from '../useStore'
 
 afterEach(cleanup)
 
-describe('useStore', () => {
+describe.skip('useStore', () => {
   it('should render', () => {
     const store = createStore('foo')
     const changeText = createEvent('change text')

@@ -108,7 +108,6 @@ test('combine', () => {
   inc()
   dec()
   expect(result.getState()).toMatchObject({a: -9, b: 9, c: 0, d: 0})
-  console.log(result.getState(), spy.mock.calls)
 
   expect(spy).toHaveBeenCalledTimes(3)
   // expect(fn).toHaveBeenCalledTimes(5)
@@ -126,7 +125,7 @@ test('no dull updates', () => {
   store.on(e2, (_, p) => _ === p)
   const nextStore = store.map(x => (fn2(x), x))
   nextStore.watch(fn3)
-  store.watch(e => console.log('store', e))
+  store.watch(e => {})
   // nextStore.watch(e => console.log('next store', e))
   e1(false)
   e1(true)
@@ -150,8 +149,6 @@ test('smoke', async() => {
   effect.use(used)
   effect.done.watch(usedDone)
   const event = domain.event('event1')
-  console.log(effect)
-  console.log(event)
   expect(effect).toBeDefined()
   expect(event).toBeDefined()
   event('bar')
@@ -163,8 +160,8 @@ test('smoke', async() => {
 //TODO Add port throws handling
 describe('port', () => {
   test('port should work correctly', async() => {
-    const used = jest.fn(state => console.log(state))
-    const usedEff = jest.fn(state => console.log(state))
+    const used = jest.fn(state => {})
+    const usedEff = jest.fn(state => {})
     const domain = createDomain()
     const event = domain.event('port-event')
     const eff = domain.event('port-effect')
@@ -222,7 +219,7 @@ test.skip('hot reload support', async() => {
   const usedDone = jest.fn(x => Promise.resolve(x))
   const domain = createDomain()
   const storeA = domain.store({foo: 'bar'})
-  storeA.watch((s, x) => (fnA(x), console.log(x), s))
+  storeA.watch((s, x) => (fnA(x), s))
 
   const effect = domain.effect('eff')
   effect.use(used)
@@ -234,7 +231,7 @@ test.skip('hot reload support', async() => {
   expect(usedDone).toHaveBeenCalledTimes(1)
 
   const storeB = domain.store({foo: 'bar'})
-  storeB.watch((s, x) => (fnB(x), console.log(x), s))
+  storeB.watch((s, x) => (fnB(x), s))
 
   await event('ev')
   expect(used).toHaveBeenCalledTimes(2)
