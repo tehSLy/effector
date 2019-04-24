@@ -12,7 +12,6 @@ import type {Effect} from 'effector/effect'
 import {launch} from 'effector/kernel'
 import {noop} from 'effector/blocks'
 
-import {getDisplayName} from '../naming'
 import type {Subscription} from '../index.h'
 import type {EventConfigPart} from '../config'
 import type {Event} from './index.h'
@@ -159,14 +158,13 @@ function watchEvent<Payload>(
   return forward({
     from: event,
     to: createGraph({
-      scope: {trigger: event, handler: watcher},
+      scope: {handler: watcher},
       //prettier-ignore
       node: [
         noop,
         step.run({
-          fn: (payload: Payload, {trigger, handler}) => handler(
+          fn: (payload: Payload, {handler}) => handler(
             payload,
-            getDisplayName(trigger),
           ),
         }),
       ]
