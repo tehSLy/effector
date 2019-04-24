@@ -10,7 +10,7 @@ import {
 } from 'effector/stdlib'
 import type {Effect} from 'effector/effect'
 import {launch} from 'effector/kernel'
-import {noop} from 'effector/blocks'
+import {noop, updateHandler} from 'effector/blocks'
 
 import type {Subscription} from '../index.h'
 import type {EventConfigPart} from '../config'
@@ -82,11 +82,7 @@ function prepend(event, fn: (_: any) => *) {
     to: createGraph({
       child: [event],
       scope: {handler: fn},
-      node: [
-        step.compute({
-          fn: (newValue, {handler}) => handler(newValue),
-        }),
-      ],
+      node: [updateHandler],
     }),
   })
   return contramapped
@@ -107,11 +103,7 @@ function mapEvent<A, B>(event: Event<A> | Effect<A, any, any>, fn: A => B) {
     to: createGraph({
       child: [mapped],
       scope: {handler: fn},
-      node: [
-        step.compute({
-          fn: (payload, {handler}) => handler(payload),
-        }),
-      ],
+      node: [updateHandler],
     }),
   })
   return mapped
@@ -131,19 +123,9 @@ function filterEvent<A, B>(
       scope: {handler: fn},
       child: [mapped],
       node: [
-        step.compute({
-          fn: (payload, {handler}) => handler(payload),
-        }),
+        updateHandler,
         step.filter({
-          fn(result, scope) {
-            scope.val = result
-            return result !== undefined
-          },
-        }),
-        step.compute({
-          fn(newValue, scope) {
-            return scope.val
-          },
+          fn: upd => upd !== undefined,
         }),
       ],
     }),

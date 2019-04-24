@@ -11,10 +11,11 @@ declare export function createApi<
   setters: Obj,
 ): $ObjMap<Obj, <E>(h: (store: S, e: E) => S) => Event<E>>
 
-export function createApi(store: Store<any>, setters: {[string]: Function}) {
+export function createApi(store: Store<any>, handlers: {[string]: Function}) {
   const result = {}
-  for (const [key, handler] of Object.entries(setters)) {
-    store.on((result[key] = createEvent(key)), (handler: any))
+  for (const key in handlers) {
+    const event = (result[key] = createEvent(key))
+    store.on(event, (handlers[key]: any))
   }
   return result
 }

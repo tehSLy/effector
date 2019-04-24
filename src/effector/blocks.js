@@ -13,3 +13,7 @@ export const filterChanged = step.filter({
 export const noop = step.compute({
   fn: n => n,
 })
+
+export const updateHandler = step.compute({
+  fn: (upd, {handler}) => handler(upd),
+})
