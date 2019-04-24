@@ -139,12 +139,6 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
     }),
   })
 }
-export function thru(fn: Function) {
-  return fn(this)
-}
-export function dispatch(action: any) {
-  return action
-}
 
 export function mapStore<A, B>(
   store: Store<A>,

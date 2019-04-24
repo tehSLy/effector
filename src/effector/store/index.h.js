@@ -41,7 +41,6 @@ export type Store<State> = /*::interface extends Unit*/ {
   ): Store<State>,
   off(event: Event<any>): void,
   subscribe(listner: any): Subscription,
-  thru<U>(fn: (store: Store<State>) => U): U,
   //prettier-ignore
   /*::+*/ watch: (
     & (

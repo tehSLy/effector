@@ -9,8 +9,7 @@ configure({
 
 import * as React from 'react'
 import {mount} from 'enzyme'
-import {createStore} from 'effector/store'
-import {createEvent} from 'effector/event'
+import {createStore, createEvent} from 'effector'
 import {connect} from '..'
 
 test('connect api', () => {
@@ -60,9 +59,7 @@ test('click counter', () => {
       )
     }
   }
-  const ConnectedDisplay = store
-    .map(count => ({count}))
-    .thru((connect(Display): any))
+  const ConnectedDisplay = connect(Display)(store.map(count => ({count})))
 
   const tree = mount(<ConnectedDisplay />)
   expect(tree.text()).toMatchSnapshot()

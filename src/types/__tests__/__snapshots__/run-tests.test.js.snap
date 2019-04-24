@@ -840,19 +840,19 @@ Object {
               "context": "    const domain3 = createDomain(234)",
               "descr": "[1]",
               "end": 36,
-              "endline": 201,
-              "line": 201,
+              "endline": 186,
+              "line": 186,
               "loc": Object {
                 "end": Object {
                   "column": 36,
-                  "line": 201,
-                  "offset": 4935,
+                  "line": 186,
+                  "offset": 4573,
                 },
                 "source": "types.test.js",
                 "start": Object {
                   "column": 34,
-                  "line": 201,
-                  "offset": 4932,
+                  "line": 186,
+                  "offset": 4570,
                 },
                 "type": "SourceFile",
               },
@@ -898,19 +898,19 @@ Object {
           "context": "    const domain3 = createDomain(234)",
           "descr": "Cannot call \`createDomain\` with \`234\` bound to \`domainName\` because number [1] is incompatible with string [2].",
           "end": 36,
-          "endline": 201,
-          "line": 201,
+          "endline": 186,
+          "line": 186,
           "loc": Object {
             "end": Object {
               "column": 36,
-              "line": 201,
-              "offset": 4935,
+              "line": 186,
+              "offset": 4573,
             },
             "source": "types.test.js",
             "start": Object {
               "column": 34,
-              "line": 201,
-              "offset": 4932,
+              "line": 186,
+              "offset": 4570,
             },
             "type": "SourceFile",
           },
@@ -943,19 +943,19 @@ Object {
               "context": "    const domain4 = createDomain({foo: true})",
               "descr": "[1]",
               "end": 44,
-              "endline": 202,
-              "line": 202,
+              "endline": 187,
+              "line": 187,
               "loc": Object {
                 "end": Object {
                   "column": 44,
-                  "line": 202,
-                  "offset": 4981,
+                  "line": 187,
+                  "offset": 4619,
                 },
                 "source": "types.test.js",
                 "start": Object {
                   "column": 34,
-                  "line": 202,
-                  "offset": 4970,
+                  "line": 187,
+                  "offset": 4608,
                 },
                 "type": "SourceFile",
               },
@@ -1001,19 +1001,19 @@ Object {
           "context": "    const domain4 = createDomain({foo: true})",
           "descr": "Cannot call \`createDomain\` with object literal bound to \`domainName\` because object literal [1] is incompatible with string [2].",
           "end": 44,
-          "endline": 202,
-          "line": 202,
+          "endline": 187,
+          "line": 187,
           "loc": Object {
             "end": Object {
               "column": 44,
-              "line": 202,
-              "offset": 4981,
+              "line": 187,
+              "offset": 4619,
             },
             "source": "types.test.js",
             "start": Object {
               "column": 34,
-              "line": 202,
-              "offset": 4970,
+              "line": 187,
+              "offset": 4608,
             },
             "type": "SourceFile",
           },
@@ -1044,7 +1044,7 @@ src/types/types.test.ts(53,11): error TS2322: Type 'Event<string>' is not assign
 src/types/types.test.ts(68,11): error TS2322: Type 'Store<number>' is not assignable to type 'Store<string>'.
 src/types/types.test.ts(119,11): error TS2322: Type 'Store<string>' is not assignable to type 'Store<number>'.
   Type 'string' is not assignable to type 'number'.
-src/types/types.test.ts(201,34): error TS2345: Argument of type '234' is not assignable to parameter of type 'string | undefined'.
-src/types/types.test.ts(202,34): error TS2345: Argument of type '{ foo: boolean; }' is not assignable to parameter of type 'string'.
+src/types/types.test.ts(186,34): error TS2345: Argument of type '234' is not assignable to parameter of type 'string | undefined'.
+src/types/types.test.ts(187,34): error TS2345: Argument of type '{ foo: boolean; }' is not assignable to parameter of type 'string'.
 "
 `;

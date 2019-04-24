@@ -177,21 +177,6 @@ describe('Store', () => {
       const check2: number = payload
     })
   })
-
-  test('#thru', () => {
-    const event = createEvent()
-    const store = createStore(0)
-    const result = store.thru(store => {
-      const check: Store<number> = store
-      return check
-    })
-
-    const computed = store.map(() => 'hello')
-    const result1 = computed.thru(store => {
-      const check: Store<string> = store
-      return check
-    })
-  })
 })
 
 describe('Domain', () => {
