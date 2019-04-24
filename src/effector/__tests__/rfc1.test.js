@@ -2,7 +2,7 @@
 import * as React from 'react'
 import TestRenderer from 'react-test-renderer'
 import {from} from 'most'
-import {createStore, createStoreObject, withProps} from 'effector/store'
+import {createStore, createStoreObject} from 'effector/store'
 import {createEvent, type Event} from 'effector/event'
 import {createEffect} from 'effector/effect'
 
@@ -235,20 +235,22 @@ test('rfc1 example implementation', async() => {
   store.watch(state => {
     // console.warn('new state', state)
   })
-  const ClickedTimes = withProps(
-    store.map(({counter}) => `Clicked: ${counter} times`),
-    state => {
-      expect(state).not.toBe(text)
-      expect(typeof state).toBe('string')
-      return <span>{state}</span>
-    },
-  )
+  const mapped = store.map(({counter}) => `Clicked: ${counter} times`)
+  const ClickedTimes = () => {
+    const state = mapped.getState()
+    expect(state).not.toBe(text)
+    expect(typeof state).toBe('string')
+    return <span>{state}</span>
+  }
 
-  const CurrentText = withProps(store, ({text}, props) => (
-    <p>
-      {props.prefix} {text}
-    </p>
-  ))
+  const CurrentText = props => {
+    const {text} = store.getState()
+    return (
+      <p>
+        {props.prefix} {text}
+      </p>
+    )
+  }
 
   const App = () => (
     <React.Fragment>

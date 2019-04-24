@@ -20,13 +20,11 @@ export {
   createStore,
   createStoreObject,
   setStoreName,
-  extract,
   createApi,
   restore,
   restoreEvent,
   restoreEffect,
   restoreObject,
-  withProps,
 } from 'effector/store'
 
 export {Kind, clearNode, createGraph as createNode, step} from 'effector/stdlib'
