@@ -51,7 +51,6 @@ export function eventFabric<Payload>({
   //eslint-disable-next-line no-unused-vars
   ;(instance: any).create = (payload, fullName, args) => {
     launch(instance, payload)
-    return payload
   }
   ;(instance: any).kind = Kind.event
   ;(instance: any)[$$observable] = () => instance
