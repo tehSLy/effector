@@ -9,9 +9,6 @@
 export {combine} from './combine'
 export {sample} from './sample'
 
-export type {Domain} from 'effector/domain'
-export {createDomain} from 'effector/domain'
-
 export type {Event} from 'effector/event'
 export {createEvent, forward, fromObservable, filter} from 'effector/event'
 

@@ -1,49 +1,11 @@
 //@flow
 
-import {createDomain} from 'effector/domain'
 import {createEvent} from 'effector/event'
 import {createStore, createStoreObject} from 'effector/store'
 import {storeNaming} from '../setStoreName'
 import {unitObjectName} from '../../naming'
 
-const rootDomain = createDomain('')
-
 describe('naming', () => {
-  describe('domain', () => {
-    test('value store', () => {
-      const domain = rootDomain.domain('form')
-      const firstName = domain.store('')
-      const lastName = domain.store('')
-      //babel does this
-      //storeNaming({firstName, lastName})
-
-      expect(firstName.domainName?.fullName).toBe('form')
-      expect(lastName.domainName?.fullName).toBe('form')
-      expect(firstName.compositeName?.fullName).toBe('form/firstName')
-      expect(lastName.compositeName?.fullName).toBe('form/lastName')
-    })
-
-    // unclear behaviour
-    test('object store', () => {
-      const domain = rootDomain.domain('form')
-      const firstName = domain.store('')
-      const lastName = domain.store('')
-      const formObject = createStoreObject({firstName, lastName})
-
-      storeNaming({formObject})
-      //TODO fix naming issue
-      //should be:
-      //expect(formObject.compositeName?.fullName).toBe('form/formObject')
-      //expect(firstName.compositeName?.fullName)
-      //.toBe('form/formObject/firstName')
-      //expect(lastName.compositeName?.fullName)
-      //.toBe('form/formObject/lastName')
-      expect(formObject.compositeName?.fullName).toBe('formObject')
-      expect(firstName.compositeName?.fullName).toBe('formObject/firstName')
-      expect(lastName.compositeName?.fullName).toBe('formObject/lastName')
-    })
-  })
-
   test("doesn't accept wrong types", () => {
     const spy = jest.spyOn(global.console, 'warn')
     const foo = createEvent('foo')

@@ -2,8 +2,8 @@
 
 import {
   createApi,
-  createDomain,
-  type Domain,
+  createEvent,
+  createStore,
   type Effect,
   type Event,
   type Store,
@@ -67,8 +67,6 @@ export type FormApi<
 //   return {value, update}
 // }
 
-const formDomain = createDomain('forms')
-
 export function createFormApi<
   Form: {[key: string]: any},
   External: {[key: string]: any},
@@ -82,7 +80,6 @@ export function createFormApi<
   submitEffect,
   validate,
   initialValues,
-  domain = formDomain,
   resetOnSubmit = true,
 }: {
   fields: Form,
@@ -94,7 +91,6 @@ export function createFormApi<
   submitEvent?: Event<SpreadProps<Form, External>>,
   submitEffect?: Effect<SpreadProps<Form, External>, Data, Error>,
   initialValues?: Store<?Form> | Store<Form>,
-  domain?: Domain,
   resetOnSubmit?: boolean,
 }): FormApi<Form, Errors> {
   let initialValuesUnwatch = () => {}
@@ -102,12 +98,12 @@ export function createFormApi<
   const form = {}
   const reducers = {}
 
-  const handleSubmit = domain.event('handle submit')
-  const values = domain.store(fields, {name: 'values'})
-  const errors = domain.store(({}: any), {name: 'errors'})
+  const handleSubmit = createEvent('handle submit')
+  const values = createStore(fields, {name: 'values'})
+  const errors = createStore(({}: any), {name: 'errors'})
   const isValid = errors.map(errors => Object.keys(errors).length === 0)
-  const submitted = domain.store(false, {name: 'submitted'})
-  const loading = domain.store(false, {name: 'loading'})
+  const submitted = createStore(false, {name: 'submitted'})
+  const loading = createStore(false, {name: 'loading'})
 
   form.values = values
   form.submitted = submitted

@@ -4,7 +4,7 @@ import {from, periodic} from 'most'
 
 import {combine} from '..'
 
-import {createDomain} from 'effector/domain'
+import {createEffect} from 'effector/effect'
 import {createEvent, fromObservable} from 'effector/event'
 import {createStore, createStoreObject} from 'effector/store'
 
@@ -143,12 +143,11 @@ test('no dull updates', () => {
 test('smoke', async() => {
   const used = jest.fn(x => Promise.resolve(x))
   const usedDone = jest.fn(x => Promise.resolve(x))
-  const domain = createDomain('smoke')
 
-  const effect = domain.effect('eff')
+  const effect = createEffect('eff')
   effect.use(used)
   effect.done.watch(usedDone)
-  const event = domain.event('event1')
+  const event = createEvent('event1')
   expect(effect).toBeDefined()
   expect(event).toBeDefined()
   event('bar')
@@ -162,9 +161,8 @@ describe('port', () => {
   test('port should work correctly', async() => {
     const used = jest.fn(state => {})
     const usedEff = jest.fn(state => {})
-    const domain = createDomain()
-    const event = domain.event('port-event')
-    const eff = domain.event('port-effect')
+    const event = createEvent('port-event')
+    const eff = createEvent('port-effect')
     event.watch(used)
     eff.watch(usedEff)
     const str$ = periodic(100)
@@ -198,12 +196,11 @@ it('works with most use cases', async() => {
 test.skip('fromObservable supports own events as sources', async() => {
   const used = jest.fn(x => Promise.resolve(x))
   const usedDone = jest.fn(x => Promise.resolve(x))
-  const domain = createDomain()
 
-  const effect = domain.effect('eff')
+  const effect = createEffect('eff')
   effect.use(used)
   effect.done.watch(usedDone)
-  const event = domain.event('event1')
+  const event = createEvent('event1')
   fromObservable<string>(event).watch(e => effect(e))
   await event('ev')
   expect(used).toHaveBeenCalledTimes(1)
@@ -217,20 +214,19 @@ test.skip('hot reload support', async() => {
   const fnB = jest.fn()
   const used = jest.fn(x => Promise.resolve(x))
   const usedDone = jest.fn(x => Promise.resolve(x))
-  const domain = createDomain()
-  const storeA = domain.store({foo: 'bar'})
+  const storeA = createStore({foo: 'bar'})
   storeA.watch((s, x) => (fnA(x), s))
 
-  const effect = domain.effect('eff')
+  const effect = createEffect('eff')
   effect.use(used)
   effect.done.watch(usedDone)
-  const event = domain.event('event1')
+  const event = createEvent('event1')
   epic(event, data$ => data$.map(e => effect(e)))
   await event('ev')
   expect(used).toHaveBeenCalledTimes(1)
   expect(usedDone).toHaveBeenCalledTimes(1)
 
-  const storeB = domain.store({foo: 'bar'})
+  const storeB = createStore({foo: 'bar'})
   storeB.watch((s, x) => (fnB(x), s))
 
   await event('ev')
@@ -274,13 +270,12 @@ test('typeConstant', async() => {
 */
 test('subscription', async() => {
   const spy = jest.fn()
-  const domain = createDomain()
 
-  const eff = domain.effect('TYPE_CONST')
+  const eff = createEffect('TYPE_CONST')
   expect(() => {
     from(eff).observe(spy)
   }).not.toThrow()
-  const event = domain.event('ev')
+  const event = createEvent('ev')
   expect(() => {
     from(event).observe(spy)
   }).not.toThrow()

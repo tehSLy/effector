@@ -5,7 +5,6 @@ import {
   createEvent,
   createEffect,
   createStoreObject,
-  createDomain,
   combine,
   sample,
   Effect,
@@ -176,15 +175,6 @@ describe('Store', () => {
       const check1: string = state
       const check2: number = payload
     })
-  })
-})
-
-describe('Domain', () => {
-  test('createDomain', () => {
-    const domain = createDomain()
-    const domain2 = createDomain('hello')
-    const domain3 = createDomain(234)
-    const domain4 = createDomain({foo: true})
   })
 })
 

@@ -2,9 +2,7 @@
 
 import * as React from 'react'
 import {useEffect} from 'react'
-import {createDomain, createApi, type Store, type Event} from 'effector'
-
-const {store: createStore} = createDomain('Gate')
+import {createStore, createApi, type Store, type Event} from 'effector'
 
 export type Gate<Props = {||}> = Class<React.Component<Props>> &
   interface {

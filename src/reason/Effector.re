@@ -1,13 +1,5 @@
 module Unit = {};
 
-module Domain = {
-  include Unit;
-
-  type t('e) = 'e => 'e;
-
-  [@bs.module "effector"] external make: string => t('e) = "createDomain";
-};
-
 module Effect = {
   include Unit;
 
