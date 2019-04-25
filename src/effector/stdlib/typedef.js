@@ -107,7 +107,6 @@ export function cmd(type: string, data: Object) {
   return {
     id: nextID(),
     type,
-    group: 'cmd',
     data,
   }
 }
