@@ -7,7 +7,6 @@ import {Kind} from 'effector/stdlib'
 import {step} from 'effector/stdlib'
 import {eventFabric, type Event} from 'effector/event'
 import type {EffectConfigPart} from '../config'
-import type {CompositeName} from '../compositeName'
 
 function OnResolve(result) {
   const {event, params, handler} = this
@@ -59,13 +58,9 @@ const notifyHandler = step.run({
 })
 export function effectFabric<Payload, Done>({
   name,
-  domainName,
-  parent,
   config,
 }: {
   name?: string,
-  domainName: string,
-  parent?: CompositeName,
   config: EffectConfigPart<Payload, Done>,
 }): Effect<Payload, Done, *> {
   const {handler} = config
@@ -73,19 +68,16 @@ export function effectFabric<Payload, Done>({
   //$off
   const instance: Effect<Payload, Done, any> = eventFabric({
     name,
-    parent,
     config,
   })
 
   const eventCreate = instance.create
   const done: Event<{params: Payload, result: Done}> = eventFabric({
     name: '' + instance.shortName + ' done',
-    parent,
     config,
   })
   const fail: Event<{params: Payload, error: *}> = eventFabric({
     name: '' + instance.shortName + ' fail',
-    parent,
     config,
   })
   done.graphite.seq.push(notifyHandler)

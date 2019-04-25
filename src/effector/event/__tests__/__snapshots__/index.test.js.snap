@@ -4,7 +4,7 @@ exports[`event.filter use case: evenNum event graph 1`] = `
 "Graph {
   Seq [
     1. emit {{
-       fullName: number →? *
+       fullName: c
     }}
   ]
   Next [
@@ -33,7 +33,7 @@ exports[`event.filter use case: num event graph 1`] = `
          *  Graph {
             Seq [
               1. emit {{
-                 fullName: number →? *
+                 fullName: c
               }}
             ]
             Next [
