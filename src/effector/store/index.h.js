@@ -5,20 +5,10 @@ import type {Event} from 'effector/event'
 import type {Effect} from 'effector/effect'
 import type {CompositeName} from '../compositeName'
 
-export type ThisStore = {
-  compositeName?: CompositeName,
-  defaultState: any,
-  +graphite: Graph,
-  +id: string,
-  kind: kind,
-  plainState: StateRef,
-  shortName: ID,
-  subscribers: Map<Event<any>, Subscription>,
-}
-
 export type Store<State> = /*::interface extends Unit*/ {
   /*::+*/ id: string,
   /*::+*/ stateRef: StateRef,
+  subscribers: Map<Unit, Subscription>,
   reset(trigger: Unit): Store<State>,
   getState(): State,
   setState(newState: State): void,
