@@ -9,7 +9,6 @@ import {
   type StateRef,
 } from 'effector/stdlib'
 import {is} from 'effector/validate'
-import {unitObjectName} from 'effector/naming'
 import {forward} from 'effector/event'
 
 import type {Store} from './index.h'
@@ -54,8 +53,6 @@ const storeCombination = (obj: any, clone: Function, defaultState: any) => {
   const stateNew = clone(defaultState)
   const store = storeFabric({
     currentState: stateNew,
-    //TODO: add location
-    config: {name: unitObjectName(obj)},
   })
   const isFresh = createStateRef(false)
   for (const key in obj) {
@@ -134,22 +131,3 @@ declare export function extract<
     <S>(field: Store<S> | S) => S,
   >,
 >
-declare export function extract<
-  State: {-[key: string]: Store<any> | any},
-  NextState: {-[key: string]: Store<any> | any},
->(
-  obj: Store<State>,
-  extractor: (_: State) => NextState,
-): Store<
-  $ObjMap<
-    NextState,
-    //prettier-ignore
-    <S>(field: Store<S> | S) => S,
-  >,
->
-export function extract(store: Store<any>, extractor: any => any) {
-  let result
-  if ('defaultShape' in store) result = extractor((store: any).defaultShape)
-  else result = extractor((store: any).defaultState)
-  return createStoreObject(result)
-}

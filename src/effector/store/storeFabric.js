@@ -20,13 +20,12 @@ import {launch} from 'effector/kernel'
 
 export function storeFabric<State>(props: {
   currentState: State,
-  config: ConfigPart,
+  config?: ConfigPart,
   parent?: CompositeName,
 }): Store<State> {
-  const {currentState, config, parent} = props
-  const {name} = config
+  const {currentState, config = {}, parent} = props
   const plainState = createStateRef(currentState)
-  const currentId = name || plainState.id
+  const currentId = config.name ?? plainState.id
   const defaultState = currentState
   const compositeName = createName(currentId, parent)
 

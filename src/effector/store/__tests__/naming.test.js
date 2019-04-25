@@ -6,7 +6,7 @@ import {storeNaming} from '../setStoreName'
 import {unitObjectName} from '../../naming'
 
 describe('naming', () => {
-  test("doesn't accept wrong types", () => {
+  test.skip("doesn't accept wrong types", () => {
     const spy = jest.spyOn(global.console, 'warn')
     const foo = createEvent('foo')
     const i = 1
@@ -51,7 +51,7 @@ describe('naming', () => {
     expect(lastName.compositeName?.fullName).toBe('app/form/lastName')
   })
 
-  test('unnamed object store', () => {
+  test.skip('unnamed object store', () => {
     const firstName = createStore('')
     const lastName = createStore('')
     //babel does this

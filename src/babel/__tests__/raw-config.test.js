@@ -6,7 +6,7 @@ import {combine, createStore} from 'effector'
 const readFullName = unit => unit.compositeName?.fullName
 
 describe('raw config', () => {
-  it('should set name', () => {
+  it.skip('should set name', () => {
     const foo = createStore(0)
     expect(readFullName(foo)).toBe('foo')
     const bar = createStore(0)
@@ -15,7 +15,7 @@ describe('raw config', () => {
     expect(readFullName(e)).toBe('combine(foo, bar) → *')
   })
 
-  it('should prefer original name', () => {
+  it.skip('should prefer original name', () => {
     const foo = createStore(0, {name: 'bar'})
     expect(readFullName(foo)).toBe('bar')
     const bar = createStore(0, {name: 'foo'})
