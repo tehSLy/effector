@@ -75,7 +75,7 @@ export function storeFabric<State>(props: {
   ;(store: any).reset = reset.bind(store, storeInstance)
   ;(store: any).on = on.bind(store, storeInstance)
   ;(store: any).defaultState = defaultState
-  ;(store: any).map = mapStore.bind(storeFabric, store)
+  ;(store: any).map = mapStore.bind(null, store)
   //$off
   store[$$observable] = observable.bind(null, storeInstance)
 
@@ -214,7 +214,7 @@ function mapStore<A, B>(
   } catch (err) {
     console.error(err)
   }
-  const innerStore: Store<any> = this({
+  const innerStore: Store<any> = storeFabric({
     currentState: lastResult,
   })
   forward({
