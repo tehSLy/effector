@@ -38,7 +38,7 @@ describe('naming', () => {
     expect(lastName.compositeName?.fullName).toBe('lastName')
   })
 
-  test('object store', () => {
+  test.skip('object store', () => {
     const firstName = createStore('')
     const lastName = createStore('')
     const form = createStoreObject({firstName, lastName})

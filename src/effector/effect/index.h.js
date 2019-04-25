@@ -36,7 +36,6 @@ export type Effect<Params, Done, Fail = Error> = /*::interface extends Unit*/ {
   getType(): string,
   +kind: kind,
   shortName: string,
-  domainName?: CompositeName,
   graphite: Graph,
   compositeName: CompositeName,
 }
@@ -71,7 +70,6 @@ export type FnEffect<Params, Done, Fail = Error, +Fn = Function> = {
   getType(): string,
   +kind: kind,
   shortName: string,
-  domainName?: CompositeName,
   graphite: Graph,
   compositeName: CompositeName,
 }

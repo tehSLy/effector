@@ -8,15 +8,11 @@ import type {Effect} from 'effector/effect'
 
 export function getDisplayName(unit: {
   compositeName?: CompositeName,
-  domainName?: CompositeName,
   /*::+*/ id: string,
   /*::...*/
 }) {
   if (unit.compositeName) {
     return unit.compositeName.fullName
-  }
-  if (unit.domainName) {
-    return unit.domainName.fullName
   }
   return unit.id
 }

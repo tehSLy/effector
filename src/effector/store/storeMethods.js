@@ -138,9 +138,7 @@ export function mapStore<A, B>(
     console.error(err)
   }
   const innerStore: Store<any> = this({
-    config: {name: '' + store.shortName + ' → *'},
     currentState: lastResult,
-    parent: store.domainName,
   })
   forward({
     from: store,

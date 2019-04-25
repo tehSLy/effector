@@ -11,7 +11,6 @@ export function createEffect<Payload, Done>(
   const opts = normalizeConfig(config)
   return effectFabric({
     name,
-    domainName: '',
     config: opts,
   })
 }

@@ -13,9 +13,6 @@ function sampleStore(source: Store<any>, sampler: Event<any> | Store<any>) {
 
   const unit = storeFabric({
     currentState: source.defaultState,
-    //TODO: add location
-    config: {name: source.shortName},
-    parent: source.domainName,
   })
 
   //TODO: unsubscribe from this

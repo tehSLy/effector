@@ -9,7 +9,6 @@ type StoreMeasurementPhase = 'map' | 'subscribe'
 let currentPhase: StoreMeasurementPhase | null = null
 let currentPhaseStore: {
   compositeName?: CompositeName,
-  domainName?: CompositeName,
   /*::+*/ id: string,
   /*::...*/
 } | null = null
@@ -19,7 +18,6 @@ const enableUserTimingAPI = __DEV__
 function startPhaseTimer(/*::
   store: {
     compositeName?: CompositeName,
-    domainName?: CompositeName,
     +id: string,
     ...
   },
@@ -116,7 +114,6 @@ if (enableUserTimingAPI) {
   startPhaseTimer = function(
     store: {
       compositeName?: CompositeName,
-      domainName?: CompositeName,
       /*::+*/ id: string,
       /*::...*/
     },

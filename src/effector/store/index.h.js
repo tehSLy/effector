@@ -8,7 +8,6 @@ import type {CompositeName} from '../compositeName'
 export type ThisStore = {
   compositeName?: CompositeName,
   defaultState: any,
-  domainName?: CompositeName,
   +graphite: Graph,
   +id: string,
   kind: kind,
@@ -71,7 +70,6 @@ export type Store<State> = /*::interface extends Unit*/ {
   +kind: kind,
   +defaultState: State,
   shortName: string,
-  domainName?: CompositeName,
   +graphite: Graph,
   compositeName?: CompositeName,
 }

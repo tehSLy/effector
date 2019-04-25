@@ -6,7 +6,7 @@ import type {Store} from './index.h'
 import {createName} from '../compositeName'
 
 export function setStoreName<State>(store: Store<State>, rawName: string) {
-  const compositeName = createName(rawName, store.domainName)
+  const compositeName = createName(rawName)
   store.shortName = rawName
   if (!store.compositeName) {
     store.compositeName = compositeName
@@ -27,14 +27,9 @@ function isStoreObject(store: Store<any>) {
 
 export function storeNaming<Obj: {[key: string]: Store<any> | Object}>(
   object: Obj,
-  parent?: Store<any>,
 ) {
-  const entries: Array<[string, Store<any>]> = (Object.entries(object): any)
-  for (const [storeName, store] of entries) {
-    if (parent && is.store(store)) {
-      store.domainName = parent.compositeName || store.domainName
-    }
-
+  for (const storeName in object) {
+    const store = object[storeName]
     if (isStoreObject(store)) {
       setStoreName(store, storeName)
       //$todo
