@@ -9,6 +9,7 @@ import {
   createStateRef,
   readRef,
   writeRef,
+  bind,
   type Unit,
 } from 'effector/stdlib'
 import {filterChanged, noop} from 'effector/blocks'
@@ -57,21 +58,21 @@ export function storeFabric<State>(props: {
     kind: Kind.store,
     id: plainState.id,
     shortName: currentId,
-    getState: readRef.bind(null, plainState),
+    getState: bind(readRef, plainState),
     stateRef: plainState,
     subscribers,
   }
-  ;(store: any).off = off.bind(null, store)
-  ;(store: any).subscribe = subscribe.bind(null, store)
-  ;(store: any).watch = watch.bind(null, store)
+  ;(store: any).off = bind(off, store)
+  ;(store: any).subscribe = bind(subscribe, store)
+  ;(store: any).watch = bind(watch, store)
   ;(store: any).defaultState = defaultState
-  ;(store: any).setState = launch.bind(null, store)
+  ;(store: any).setState = bind(launch, store)
   ;(store: any).defaultConfig = config
-  ;(store: any).reset = reset.bind(null, store)
-  ;(store: any).on = on.bind(null, store)
-  ;(store: any).map = mapStore.bind(null, store)
+  ;(store: any).reset = bind(reset, store)
+  ;(store: any).on = bind(on, store)
+  ;(store: any).map = bind(mapStore, store)
   //$off
-  store[$$observable] = observable.bind(null, store)
+  store[$$observable] = bind(observable, store)
 
   return store
 }

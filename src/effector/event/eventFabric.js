@@ -6,6 +6,7 @@ import {
   Kind,
   stringRefcount,
   createGraph,
+  bind,
   type Unit,
 } from 'effector/stdlib'
 import type {Effect} from 'effector/effect'
@@ -43,15 +44,15 @@ export function eventFabric<Payload>({
   const instance: Event<Payload> = (payload: Payload) =>
     instance.create(payload)
   //eslint-disable-next-line no-unused-vars
-  ;(instance: any).create = launch.bind(null, instance)
+  ;(instance: any).create = bind(launch, instance)
   ;(instance: any).kind = Kind.event
   ;(instance: any)[$$observable] = () => instance
   ;(instance: any).id = id
-  ;(instance: any).watch = watchEvent.bind(null, instance)
-  ;(instance: any).map = mapEvent.bind(null, instance)
-  ;(instance: any).filter = filterEvent.bind(null, instance)
-  ;(instance: any).prepend = prepend.bind(null, instance)
-  ;(instance: any).subscribe = subscribe.bind(null, instance)
+  ;(instance: any).watch = bind(watchEvent, instance)
+  ;(instance: any).map = bind(mapEvent, instance)
+  ;(instance: any).filter = bind(filterEvent, instance)
+  ;(instance: any).prepend = bind(prepend, instance)
+  ;(instance: any).subscribe = bind(subscribe, instance)
   instance.graphite = graphite
   instance.shortName = name
   instance.compositeName = compositeName
