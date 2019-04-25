@@ -40,15 +40,11 @@ export function eventFabric<Payload>({
   })
 
   //$off
-  const instance: Event<Payload> = (
-    payload: Payload,
-    ...args: any[]
-  ): Payload => instance.create(payload, fullName, args)
+  const instance: Event<Payload> = (payload: Payload) =>
+    instance.create(payload)
   ;(instance: any).getType = () => fullName
   //eslint-disable-next-line no-unused-vars
-  ;(instance: any).create = (payload, fullName, args) => {
-    launch(instance, payload)
-  }
+  ;(instance: any).create = launch.bind(null, instance)
   ;(instance: any).kind = Kind.event
   ;(instance: any)[$$observable] = () => instance
   ;(instance: any).id = id
@@ -65,11 +61,10 @@ export function eventFabric<Payload>({
   return instance
 }
 
-function subscribe(event, observer): Subscription {
-  return event.watch(payload => observer.next(payload))
-}
+const subscribe = (event, observer): Subscription =>
+  event.watch(payload => observer.next(payload))
 
-function prepend(event, fn: (_: any) => *) {
+const prepend = (event, fn: (_: any) => *) => {
   const contramapped: Event<any> = eventFabric({})
   forward({
     from: contramapped,

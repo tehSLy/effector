@@ -5,11 +5,11 @@ import type {CompositeName} from '../compositeName'
 
 export type Event<E> = /*::interface extends Unit*/ {
   /*::
-  [[call]](payload: E): E,
+  [[call]](payload: E): void,
   */
   /*::+*/ id: string,
   getType(): string,
-  create(payload: E, type: string, args: any[]): E,
+  create: (payload: E) => void,
   watch(watcher: (payload: E) => any): Subscription,
   map<T>(fn: (_: E) => T): Event<T>,
   filter<T>(fn: (_: E) => T | void): Event<T>,
