@@ -51,29 +51,6 @@ describe('future', () => {
   })
 })
 
-describe('effect({..}).anyway() aka .finally()', () => {
-  test(`if used function will resolve`, async() => {
-    const spy = jest.fn()
-    effect.use(async params => {
-      await delay(500)
-      spy(params)
-      return 'done!'
-    })
-    //$todo
-    await expect(effect('ok').anyway()).resolves.toBe(undefined)
-  })
-
-  test('if used function will throw', async() => {
-    const spy = jest.fn()
-    effect.use(async params => {
-      await delay(500)
-      spy(params)
-      throw 'fail!'
-    })
-    //$todo
-    await expect(effect('will throw').anyway()).resolves.toBe(undefined)
-  })
-})
 describe('createEffect with config', () => {
   it('supports empty config as second argument', async() => {
     const effect = createEffect('long request', {})

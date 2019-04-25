@@ -38,16 +38,10 @@ function Def() {
   this.rs = result => {}
   this.rj = error => {}
   */
-  const req = new Promise((rs, rj) => {
+  this.req = new Promise((rs, rj) => {
     this.rs = rs
     this.rj = rj
   })
-  //$off
-  req.anyway = () => {
-    warning(false, '.anyway is deprecated, use .finally')
-    return req.then(() => {}, () => {})
-  }
-  this.req = req
 }
 
 const notifyHandler = step.run({
