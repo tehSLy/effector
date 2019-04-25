@@ -7,7 +7,7 @@ export function combine<T>(
   f: (...args: any[]) => T,
   ...events: $ReadOnlyArray<Event<any>>
 ): Event<T> {
-  const unit = eventFabric({})
+  const unit = eventFabric()
   const l = events.length
   let awaiting = l
   const values = new Array(l)

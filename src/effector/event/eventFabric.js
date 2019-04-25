@@ -26,7 +26,7 @@ export function eventFabric<Payload>({
 }: {
   name?: string,
   config?: EventConfigPart,
-}): Event<Payload> {
+} = {}): Event<Payload> {
   const id = nextID()
   const name = nameRaw || id
   const compositeName = createName(name)
@@ -64,7 +64,7 @@ const subscribe = (event, observer): Subscription =>
   event.watch(payload => observer.next(payload))
 
 const prepend = (event, fn: (_: any) => *) => {
-  const contramapped: Event<any> = eventFabric({})
+  const contramapped: Event<any> = eventFabric()
   forward({
     from: contramapped,
     to: createGraph({
@@ -82,7 +82,7 @@ declare function mapEvent<A, B>(
   fn: (_: A) => B,
 ): Event<B>
 function mapEvent<A, B>(event: Event<A> | Effect<A, any, any>, fn: A => B) {
-  const mapped = eventFabric({})
+  const mapped = eventFabric()
   forward({
     from: event,
     to: createGraph({
@@ -95,7 +95,7 @@ function mapEvent<A, B>(event: Event<A> | Effect<A, any, any>, fn: A => B) {
 }
 
 function filterEvent<A>(event: Unit, fn: A => boolean): Event<A> {
-  const mapped = eventFabric({})
+  const mapped = eventFabric()
   forward({
     from: event,
     to: createGraph({

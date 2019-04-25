@@ -35,7 +35,7 @@ function sampleEvent(
   let current
   let hasValue = false
 
-  const unit = eventFabric({})
+  const unit = eventFabric()
 
   //TODO: unsubscribe from this
   const unsub = source.watch(value => {
