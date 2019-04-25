@@ -64,13 +64,13 @@ export function storeFabric<State>(props: {
     kind: Kind.store,
     id: plainState.id,
     shortName: currentId,
-    setState,
     off: off.bind(null, storeInstance),
     watch: watch.bind(null, storeInstance),
     subscribe: subscribe.bind(null, storeInstance),
     getState: getState.bind(null, storeInstance),
     stateRef: plainState,
   }
+  ;(store: any).setState = launch.bind(null, store)
   ;(store: any).defaultConfig = config
   ;(store: any).reset = reset.bind(store, storeInstance)
   ;(store: any).on = on.bind(store, storeInstance)
@@ -78,10 +78,6 @@ export function storeFabric<State>(props: {
   ;(store: any).map = mapStore.bind(null, store)
   //$off
   store[$$observable] = observable.bind(null, storeInstance)
-
-  function setState(value) {
-    launch(store, value)
-  }
 
   return store
 }
