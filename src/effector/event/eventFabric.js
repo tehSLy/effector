@@ -42,7 +42,6 @@ export function eventFabric<Payload>({
   //$off
   const instance: Event<Payload> = (payload: Payload) =>
     instance.create(payload)
-  ;(instance: any).getType = () => fullName
   //eslint-disable-next-line no-unused-vars
   ;(instance: any).create = launch.bind(null, instance)
   ;(instance: any).kind = Kind.event

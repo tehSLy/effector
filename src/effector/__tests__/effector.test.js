@@ -236,38 +236,6 @@ test.skip('hot reload support', async() => {
   expect(fnB).toHaveBeenCalledTimes(4)
 })
 
-/*
-test('typeConstant', async() => {
- const fn = jest.fn()
- const used = jest.fn((x: string) => console.log(x))
- const respFn = jest.fn(x => console.log(x))
- const domain = createDomain('with-prefix')
- const store = domain.store({foo: 'bar'})
- const event = domain.typeConstant('TYPE_CONST')
- const eventResp = domain.typeConstant('RESP')
- eventResp.watch(respFn)
- expect(event.getType()).toBe('TYPE_CONST')
- event.epic(data$ =>
-  data$.map(e => {
-   used(e)
-   return eventResp(e)
-  }),
- )
-
- log`type constant's event`(event)
- store.dispatch({type: 'TYPE_CONST', payload: 'raw'})
- expect(event('test')).toMatchObject({type: 'TYPE_CONST', payload: 'test'})
- expect(event).toBeDefined()
- await event('run')
- await delay(500)
- expect(respFn).toHaveBeenCalledTimes(2)
- expect(used).toHaveBeenCalledTimes(2)
- expect(used.mock.calls).toMatchObject(
-  //$ off
-  [['raw'], ['run']],
- )
-})
-*/
 test('subscription', async() => {
   const spy = jest.fn()
 

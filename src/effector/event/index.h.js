@@ -8,7 +8,6 @@ export type Event<E> = /*::interface extends Unit*/ {
   [[call]](payload: E): void,
   */
   /*::+*/ id: string,
-  getType(): string,
   create: (payload: E) => void,
   watch(watcher: (payload: E) => any): Subscription,
   map<T>(fn: (_: E) => T): Event<T>,
@@ -16,7 +15,6 @@ export type Event<E> = /*::interface extends Unit*/ {
   prepend<Before>(fn: (_: Before) => E): Event<Before>,
   subscribe(subscriber: Subscriber<E>): Subscription,
   /*::+*/ kind: kind,
-  getType(): string,
   shortName: string,
   graphite: Graph,
   compositeName: CompositeName,

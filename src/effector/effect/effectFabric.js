@@ -117,9 +117,9 @@ export function effectFabric<Payload, Done>({
       },
     }),
   )
-  ;(instance: any).create = (params: Payload, fullName, args) => {
+  ;(instance: any).create = params => {
     const req = new Def()
-    eventCreate({ɔ: {params, req}}, instance.getType(), args)
+    eventCreate({ɔ: {params, req}})
     return req.req
   }
 
@@ -149,6 +149,6 @@ function runEffect(handler, params, onResolve, onReject) {
 }
 //eslint-disable-next-line no-unused-vars
 function defaultThunk(value) {
-  warning(false, 'no thunk used in %s', this.getType())
+  warning(false, 'no thunk used in %s', this.shortName)
   return Promise.resolve()
 }

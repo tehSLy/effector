@@ -5,7 +5,6 @@ import type {Event} from 'effector/event'
 import type {CompositeName} from '../compositeName'
 
 export type Effect<Params, Done, Fail = Error> = /*::interface extends Unit*/ {
-  // (payload: Params): Future<Params, Done, Fail>,
   /*::
   [[call]](payload: Params): Promise<Done>,
   */
@@ -18,22 +17,11 @@ export type Effect<Params, Done, Fail = Error> = /*::interface extends Unit*/ {
     */
     getCurrent(): (params: Params) => Promise<Done>,
   },
-  create(payload: Params, type: string, args: any[]): Params,
+  create(payload: Params): any,
   watch(watcher: (payload: Params) => any): Subscription,
-  // getNode(): Vertex<['event', string]>,
   //map<T>(fn: (_: E) => T): Event<T>,
   prepend<Before>(fn: (_: Before) => Params): Event<Before>,
   subscribe(subscriber: Subscriber<Params>): Subscription,
-  //prettier-ignore
-  //   +to: (
-  //   & (<T>(
-  //    store: Store<T>,
-  //    reducer: (state: T, payload: Params) => T
-  //   ) => Subscription)
-  //   & ((store: Store<Params>, _: void) => Subscription)
-  //  ),
-  // epic<T>(fn: (_: Stream<Params>) => Stream<T>): Event<T>,
-  getType(): string,
   +kind: kind,
   shortName: string,
   graphite: Graph,
@@ -58,16 +46,6 @@ export type FnEffect<Params, Done, Fail = Error, +Fn = Function> = {
   //map<T>(fn: (_: E) => T): Event<T>,
   prepend<Before>(fn: (_: Before) => Params): Event<Before>,
   subscribe(subscriber: Subscriber<Params>): Subscription,
-  //prettier-ignore
-  //   +to: (
-  //   & (<T>(
-  //    store: Store<T>,
-  //    reducer: (state: T, payload: Params) => T
-  //   ) => Subscription)
-  //   & ((store: Store<Params>, _: void) => Subscription)
-  //  ),
-  // epic<T>(fn: (_: Stream<Params>) => Stream<T>): Event<T>,
-  getType(): string,
   +kind: kind,
   shortName: string,
   graphite: Graph,
