@@ -10,7 +10,7 @@ export {combine} from './combine'
 export {sample} from './sample'
 
 export type {Event} from 'effector/event'
-export {createEvent, forward, fromObservable, filter} from 'effector/event'
+export {createEvent, forward, fromObservable} from 'effector/event'
 
 export type {Effect} from 'effector/effect'
 export {createEffect} from 'effector/effect'
