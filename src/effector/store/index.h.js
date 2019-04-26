@@ -4,6 +4,7 @@ import type {Graph, kind, StateRef, ID, Unit} from 'effector/stdlib'
 import type {Event} from 'effector/event'
 import type {Effect} from 'effector/effect'
 import type {CompositeName} from '../compositeName'
+import type {StoreConfigPart} from '../config'
 
 export type Store<State> = /*::interface extends Unit*/ {
   /*::+*/ id: string,
@@ -55,4 +56,5 @@ export type Store<State> = /*::interface extends Unit*/ {
   shortName: string,
   +graphite: Graph,
   compositeName?: CompositeName,
+  defaultConfig: StoreConfigPart,
 }
