@@ -144,8 +144,19 @@ const printLayers = list => {
 let layerID = 0
 let heap: leftist = null
 const barriers = new Set()
-const pushHeap = (opts: Layer) => {
-  heap = insert(opts, heap)
+
+const addHeap = (type: LayerType, graph, scope, firstIndex, resetStop) => {
+  heap = insert(
+    {
+      step: graph,
+      firstIndex,
+      scope,
+      resetStop,
+      type,
+      id: ++layerID,
+    },
+    heap,
+  )
 }
 const runGraph = ({step: graph, firstIndex, scope, resetStop}: Layer, meta) => {
   meta.val = graph.scope
@@ -162,27 +173,13 @@ const runGraph = ({step: graph, firstIndex, scope, resetStop}: Layer, meta) => {
     } else {
       switch (step.type) {
         case 'run':
-          pushHeap({
-            step: graph,
-            firstIndex: stepn,
-            scope,
-            resetStop: false,
-            type: 'effect',
-            id: ++layerID,
-          })
+          addHeap('effect', graph, scope, stepn, false)
           return
         case 'barrier': {
           const id = step.data.barrierID
           if (!barriers.has(id)) {
             barriers.add(id)
-            pushHeap({
-              step: graph,
-              firstIndex: stepn,
-              scope,
-              resetStop: false,
-              type: 'barrier',
-              id: ++layerID,
-            })
+            addHeap('barrier', graph, scope, stepn, false)
           }
           return
         }
@@ -207,14 +204,7 @@ const runGraph = ({step: graph, firstIndex, scope, resetStop}: Layer, meta) => {
        * to override it during seq execution
        */
       const subscope = new Stack(scope.value, scope)
-      pushHeap({
-        step: graph.next[stepn],
-        firstIndex: 0,
-        scope: subscope,
-        resetStop: true,
-        type: 'child',
-        id: ++layerID,
-      })
+      addHeap('child', graph.next[stepn], subscope, 0, true)
     }
   }
   if (resetStop) {
@@ -223,14 +213,7 @@ const runGraph = ({step: graph, firstIndex, scope, resetStop}: Layer, meta) => {
 }
 export const launch = (unit: Graphite, payload: any) => {
   const step = getGraph(unit)
-  pushHeap({
-    step,
-    firstIndex: 0,
-    scope: new Stack(payload, new Stack(null, null)),
-    resetStop: false,
-    type: 'pure',
-    id: ++layerID,
-  })
+  addHeap('pure', step, new Stack(payload, new Stack(null, null)), 0, false)
   const meta = {
     stop: false,
     val: step.scope,
@@ -256,57 +239,40 @@ const command = {
   },
   emit: (meta, local, step: $PropertyType<Emit, 'data'>) => local.arg,
   filter(meta, local, step: $PropertyType<Filter, 'data'>) {
-    const runCtx = tryRun({
-      arg: local.arg,
-      val: meta.val,
-      fn: step.fn,
-    })
+    const runCtx = tryRun(local.arg, meta.val, step.fn)
     /**
      * .isFailed assignment is not needed because in such case
      * runCtx.result will be null
      * thereby successfully forcing that branch to stop
      */
-    local.isChanged = Boolean(runCtx.result)
+    local.isChanged = !!runCtx.result
     return local.arg
   },
   run(meta, local, step: $PropertyType<Run, 'data'>) {
-    const runCtx = tryRun({
-      arg: local.arg,
-      val: meta.val,
-      fn: step.fn,
-    })
+    const runCtx = tryRun(local.arg, meta.val, step.fn)
     local.isFailed = runCtx.err
     return runCtx.result
   },
-  update(meta, local, step: $PropertyType<Update, 'data'>) {
-    return writeRef(step.store, local.arg)
-  },
+  update: (meta, {arg}, {store}: $PropertyType<Update, 'data'>) =>
+    writeRef(store, arg),
   compute(meta, local, step: $PropertyType<Compute, 'data'>) {
-    const runCtx = tryRun({
-      arg: local.arg,
-      val: meta.val,
-      fn: step.fn,
-    })
+    const runCtx = tryRun(local.arg, meta.val, step.fn)
     local.isFailed = runCtx.err
     return runCtx.result
   },
   tap(meta, local, step: $PropertyType<Tap, 'data'>) {
-    const runCtx = tryRun({
-      arg: local.arg,
-      val: meta.val,
-      fn: step.fn,
-    })
+    const runCtx = tryRun(local.arg, meta.val, step.fn)
     local.isFailed = runCtx.err
     return local.arg
   },
 }
-const tryRun = ctx => {
+const tryRun = (arg, val, fn: (arg: any, val: any) => any) => {
   const result = {
     err: false,
     result: null,
   }
   try {
-    result.result = ctx.fn.call(null, ctx.arg, ctx.val)
+    result.result = fn(arg, val)
   } catch (err) {
     console.error(err)
     result.err = true
