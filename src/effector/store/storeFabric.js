@@ -29,7 +29,6 @@ export function storeFabric<State>(props: {
   const {currentState, config = {}, parent} = props
   const plainState = createStateRef(currentState)
   const currentId = config.name ?? plainState.id
-  const defaultState = currentState
   const compositeName = createName(currentId, parent)
 
   const graphite = createGraph({
@@ -50,8 +49,7 @@ export function storeFabric<State>(props: {
       }),
     ],
   })
-  const subscribers = new Map()
-  //$todo
+
   const store: $Shape<Store<State>> = {
     compositeName,
     graphite,
@@ -60,19 +58,18 @@ export function storeFabric<State>(props: {
     shortName: currentId,
     getState: bind(readRef, plainState),
     stateRef: plainState,
-    subscribers,
+    subscribers: new Map(),
+    defaultState: currentState,
+    defaultConfig: config,
   }
   ;(store: any).off = bind(off, store)
   ;(store: any).subscribe = bind(subscribe, store)
   ;(store: any).watch = bind(watch, store)
-  ;(store: any).defaultState = defaultState
   ;(store: any).setState = bind(launch, store)
-  ;(store: any).defaultConfig = config
   ;(store: any).reset = bind(reset, store)
   ;(store: any).on = bind(on, store)
   ;(store: any).map = bind(mapStore, store)
-  //$off
-  store[$$observable] = bind(observable, store)
+  ;(store: any)[$$observable] = bind(observable, store)
 
   return store
 }
@@ -80,11 +77,11 @@ export function storeFabric<State>(props: {
 const reset = (storeInstance, event: Unit) =>
   on(storeInstance, event, () => storeInstance.defaultState)
 
-function off(storeInstance, event: Event<any>) {
-  const currentSubscription = storeInstance.subscribers.get(event)
+function off({subscribers}, event: Unit) {
+  const currentSubscription = subscribers.get(event)
   if (currentSubscription === undefined) return
   currentSubscription()
-  storeInstance.subscribers.delete(event)
+  subscribers.delete(event)
 }
 
 const on = (storeInstance, from: Unit, handler: Function) => {
@@ -122,13 +119,11 @@ function observable(storeInstance) {
         typeof observer === 'object' && observer !== null,
         'Expected the observer to be an object.',
       )
-
-      function observeState(state) {
+      return subscribe(storeInstance, state => {
         if (observer.next) {
           observer.next(state)
         }
-      }
-      return subscribe(storeInstance, observeState)
+      })
     },
   }
   //$off
