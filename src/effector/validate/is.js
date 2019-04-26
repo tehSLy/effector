@@ -13,4 +13,3 @@ const is = (type: kind) => (obj: mixed) => unit(obj) && obj.kind === type
 export const store = is(Kind.store)
 export const event = is(Kind.event)
 export const effect = is(Kind.effect)
-export const domain = is(Kind.domain)
