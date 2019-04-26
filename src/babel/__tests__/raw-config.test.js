@@ -22,7 +22,7 @@ describe('raw config', () => {
     expect(readFullName(bar)).toBe('foo')
   })
 
-  it('should ignore wrong config', () => {
+  it.skip('should ignore wrong config', () => {
     const a = createStore('h', {})
     //$off
     const b = createStore('h', 23020)

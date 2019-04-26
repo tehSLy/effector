@@ -19,7 +19,6 @@ export type {Store} from 'effector/store'
 export {
   createStore,
   createStoreObject,
-  setStoreName,
   createApi,
   restore,
   restoreEvent,

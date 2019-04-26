@@ -1,5 +1,6 @@
 //@flow
 import faker from 'faker'
+import * as fs from 'fs-extra'
 // import prettyHrtime from 'pretty-hrtime'
 import {singleton, insert, iterate, type leftist} from '../leftist'
 class Cmd {
@@ -50,7 +51,7 @@ test('it works', () => {
 
   // console.table((iterate(threeTree, cmdGreaterThan): any))
 })
-test('stress', () => {
+test('stress', async() => {
   const AMOUNT = 100
   faker.seed(0xdeadbeef)
   const namesSet = Array.from({length: AMOUNT}, () => faker.name.firstName())
@@ -80,5 +81,6 @@ test('stress', () => {
   expect(order).toMatchSnapshot()
   expect(tree).toMatchSnapshot()
 
-  // console.table((order: any))
+  console.table((order: any))
+  await fs.outputJSON(__dirname + '/out.json', cmds)
 })

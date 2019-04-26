@@ -1,6 +1,6 @@
 //@flow
 
-describe('perf', () => {
+describe.skip('perf', () => {
   let effector /*:: = require('effector') */
 
   let root

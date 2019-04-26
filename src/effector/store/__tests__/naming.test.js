@@ -5,7 +5,7 @@ import {createStore, createStoreObject} from 'effector/store'
 import {storeNaming} from '../setStoreName'
 import {unitObjectName} from '../../naming'
 
-describe('naming', () => {
+describe.skip('naming', () => {
   test.skip("doesn't accept wrong types", () => {
     const spy = jest.spyOn(global.console, 'warn')
     const foo = createEvent('foo')

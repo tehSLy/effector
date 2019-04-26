@@ -2,6 +2,7 @@
 import $$observable from 'symbol-observable'
 
 import invariant from 'invariant'
+import {is} from 'effector/validate'
 import {
   step,
   createGraph,
@@ -10,26 +11,24 @@ import {
   readRef,
   writeRef,
   bind,
+  initialRun,
   type Unit,
 } from 'effector/stdlib'
 import {filterChanged, noop} from 'effector/blocks'
 import type {Store} from './index.h'
 import type {Subscriber} from '../index.h'
 import type {StoreConfigPart as ConfigPart} from '../config'
-import {createName, type CompositeName} from '../compositeName'
 
 import {launch} from 'effector/kernel'
-import {forward, type Event} from 'effector/event'
+import {forward} from 'effector/event'
 
 export function storeFabric<State>(props: {
   currentState: State,
   config?: ConfigPart,
-  parent?: CompositeName,
 }): Store<State> {
-  const {currentState, config = {}, parent} = props
+  const {currentState, config = {}} = props
   const plainState = createStateRef(currentState)
   const currentId = config.name ?? plainState.id
-  const compositeName = createName(currentId, parent)
 
   const graphite = createGraph({
     scope: {state: plainState, oldState: currentState},
@@ -51,7 +50,6 @@ export function storeFabric<State>(props: {
   })
 
   const store: $Shape<Store<State>> = {
-    compositeName,
     graphite,
     kind: Kind.store,
     id: plainState.id,
@@ -77,7 +75,7 @@ export function storeFabric<State>(props: {
 const reset = (storeInstance, event: Unit) =>
   on(storeInstance, event, () => storeInstance.defaultState)
 
-function off({subscribers}, event: Unit) {
+const off = ({subscribers}, event: Unit) => {
   const currentSubscription = subscribers.get(event)
   if (currentSubscription === undefined) return
   currentSubscription()
@@ -112,7 +110,7 @@ const on = (storeInstance, from: Unit, handler: Function) => {
   )
   return storeInstance
 }
-function observable(storeInstance) {
+const observable = storeInstance => {
   const result = {
     subscribe(observer: Subscriber<any>) {
       invariant(
@@ -132,21 +130,27 @@ function observable(storeInstance) {
   }
   return result
 }
-function watch(storeInstance, eventOrFn: Event<*> | Function, fn?: Function) {
+function watch(storeInstance, eventOrFn: Unit | Function, fn?: Function) {
   const message = 'watch requires function handler'
-  switch (eventOrFn?.kind) {
-    case 'store':
-    case 'event':
-    case 'effect':
-      invariant(typeof fn === 'function', message)
-      return eventOrFn.watch(payload =>
-        //$todo
-        fn(storeInstance.getState(), payload),
-      )
-    default:
-      invariant(typeof eventOrFn === 'function', message)
-      return subscribe(storeInstance, eventOrFn)
+  if (is.unit(eventOrFn)) {
+    invariant(typeof fn === 'function', message)
+    //TODO we need to push update immediately in case of store, aren't we?
+    //note that in another watch case it already implemented
+    return forward({
+      from: (eventOrFn: any),
+      to: createGraph({
+        scope: {handler: fn, state: storeInstance.stateRef},
+        node: [
+          noop,
+          step.run({
+            fn: (upd, {handler, state}) => handler(readRef(state), upd),
+          }),
+        ],
+      }),
+    })
   }
+  invariant(typeof eventOrFn === 'function', message)
+  return subscribe(storeInstance, eventOrFn)
 }
 function subscribe(storeInstance, listener: Function) {
   invariant(
@@ -154,12 +158,7 @@ function subscribe(storeInstance, listener: Function) {
     'Expected the listener to be a function',
   )
   let lastCall = storeInstance.getState()
-
-  try {
-    listener(lastCall)
-  } catch (err) {
-    console.error(err)
-  }
+  initialRun(() => listener(lastCall))
   return forward({
     from: storeInstance,
     to: createGraph({
@@ -186,14 +185,8 @@ function mapStore<A, B>(
   fn: (state: A, lastState?: B) => B,
   firstState?: B,
 ): Store<B> {
-  let lastResult
-  try {
-    lastResult = fn(store.getState(), firstState)
-  } catch (err) {
-    console.error(err)
-  }
   const innerStore: Store<any> = storeFabric({
-    currentState: lastResult,
+    currentState: initialRun(() => fn(store.getState(), firstState)),
   })
   forward({
     from: store,

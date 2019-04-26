@@ -16,7 +16,6 @@ import {noop, updateHandler} from 'effector/blocks'
 import type {Subscription} from '../index.h'
 import type {EventConfigPart} from '../config'
 import type {Event} from './index.h'
-import {createName} from '../compositeName'
 import {forward} from './forward'
 
 const nextID = stringRefcount()
@@ -30,12 +29,10 @@ export function eventFabric<Payload>({
 } = {}): Event<Payload> {
   const id = nextID()
   const name = nameRaw || id
-  const compositeName = createName(name)
-  const fullName = compositeName.fullName
   const graphite = createGraph({
     node: [
       step.emit({
-        fullName,
+        fullName: name,
       }),
     ],
   })
@@ -55,7 +52,6 @@ export function eventFabric<Payload>({
   ;(instance: any).subscribe = bind(subscribe, instance)
   instance.graphite = graphite
   instance.shortName = name
-  instance.compositeName = compositeName
   instance.defaultConfig = config
 
   return instance
