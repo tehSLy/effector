@@ -31,7 +31,7 @@ declare export class Event<Payload> implements Unit<Payload> {
   /*::+*/ kind: kind;
   watch(watcher: (payload: Payload) => any): Subscription;
   map<T>(fn: (_: Payload) => T): Event<T>;
-  filter<T>(fn: (_: Payload) => T | void): Event<T>;
+  filter(fn: (_: Payload) => boolean): Event<Payload>;
   prepend<Before>(fn: (_: Before) => Payload): Event<Before>;
   subscribe(subscriber: Subscriber<Payload>): Subscription;
   getType(): string;
@@ -70,8 +70,9 @@ declare export class Store<State> implements Unit<State> {
   /*::+*/ kind: kind;
   reset(trigger: Unit<any>): this;
   getState(): State;
-  map<T>(fn: (_: State, lastState?: T) => T, _: void): Store<T>;
-  map<T>(fn: (_: State, lastState: T) => T, firstState: T): Store<T>;
+  map<T>(fn: (value: State) => T): Store<T>;
+  scan<R>(accumulate: (acc: State, value: State) => State): Store<R>;
+  scan<R>(accumulate: (acc: R, value: State) => R, seed: R): Store<R>;
   on<E>(
     trigger: Unit<E>,
     handler: (state: State, payload: E) => State | void,

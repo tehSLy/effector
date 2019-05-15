@@ -67,6 +67,7 @@ export function storeFabric<State>(props: {
   ;(store: any).reset = bind(reset, store)
   ;(store: any).on = bind(on, store)
   ;(store: any).map = bind(mapStore, store)
+  ;(store: any).scan = bind(scanStore, store)
   ;(store: any)[$$observable] = bind(observable, store)
 
   return store
@@ -180,22 +181,43 @@ function subscribe(storeInstance, listener: Function) {
   })
 }
 
-function mapStore<A, B>(
-  store: Store<A>,
-  fn: (state: A, lastState?: B) => B,
-  firstState?: B,
-): Store<B> {
+function mapStore<A, B>(store: Store<A>, fn: (state: A) => B): Store<B> {
   const innerStore: Store<any> = storeFabric({
-    currentState: initialRun(() => fn(store.getState(), firstState)),
+    currentState: initialRun(() => fn(store.getState())),
   })
   forward({
     from: store,
     to: createGraph({
       child: [innerStore],
-      scope: {handler: fn, state: innerStore.stateRef},
+      scope: {handler: fn},
       node: [
         step.compute({
-          fn: (upd, {state, handler}) => handler(upd, readRef(state)),
+          fn: (upd, {handler}) => handler(upd),
+        }),
+        filterChanged,
+      ],
+    }),
+  })
+  return innerStore
+}
+
+function scanStore<A, R>(
+  store: Store<A>,
+  accumulate: (acc: R, value: A) => R,
+  seed?: R,
+): Store<R> {
+  const initialState = typeof seed !== 'undefined' ? seed : store.getState()
+  const innerStore: Store<any> = storeFabric({
+    currentState: initialRun(() => accumulate(initialState, store.getState())),
+  })
+  forward({
+    from: store,
+    to: createGraph({
+      child: [innerStore],
+      scope: {handler: accumulate, state: innerStore.stateRef},
+      node: [
+        step.compute({
+          fn: (upd, {state, handler}) => handler(readRef(state), upd),
         }),
         filterChanged,
       ],
