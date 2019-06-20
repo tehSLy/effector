@@ -136,20 +136,7 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
       noop,
       step.run({
         fn(args) {
-          let stopPhaseTimerMessage = null
-          startPhaseTimer(storeInstance, 'subscribe')
-          if (args === lastCall) {
-            stopPhaseTimer(stopPhaseTimerMessage)
-            return
-          }
-          lastCall = args
-          try {
-            listener(args)
-          } catch (err) {
-            console.error(err)
-            stopPhaseTimerMessage = 'Got error'
-          }
-          stopPhaseTimer(stopPhaseTimerMessage)
+          return listener(args)
         },
       }),
     ],
@@ -196,27 +183,18 @@ export function mapStore<A, B>(
   createLink(store, {
     child: [innerStore],
     scope: {
-      store,
       handler: fn,
       state: innerStore.stateRef,
       fail: innerStore.fail,
     },
     node: [
       step.compute({
-        fn(newValue, {state, store, handler, fail}) {
-          startPhaseTimer(store, 'map')
-          let stopPhaseTimerMessage = 'Got error'
-          let result
-          try {
-            result = handler(newValue, readRef(state))
-            stopPhaseTimerMessage = null
-          } catch (error) {
-            fail({error, state: readRef(state)})
-            console.error(error)
-          }
-          stopPhaseTimer(stopPhaseTimerMessage)
-          return result
+        fn(newValue, {state, handler}) {
+          return handler(newValue, readRef(state))
         },
+        fail(error, {state, fail}) {
+          fail({error, state: readRef(state)})
+        }
       }),
       filterChanged,
     ],
