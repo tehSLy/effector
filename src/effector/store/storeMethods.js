@@ -7,6 +7,7 @@ import {upsertLaunch} from '../kernel'
 import {step, readRef, writeRef} from '../stdlib'
 import {filterChanged, noop} from '../blocks'
 import {startPhaseTimer, stopPhaseTimer} from '../perf'
+import {runProfile, computeProfile} from '../perf/step'
 import {getDisplayName} from '../naming'
 import {createLink, type Event} from '../event'
 import type {Store, ThisStore} from './index.h'
@@ -45,20 +46,18 @@ export function on(storeInstance: ThisStore, event: any, handler: Function) {
       //prettier-ignore
       node: [
         step.compute({
-          fn(newValue, {handler, state, trigger, fail}) {
-            try {
-              const result = handler(
-                readRef(state),
-                newValue,
-                getDisplayName(trigger),
-              )
-              if (result === undefined) return
-              return writeRef(state, result)
-            } catch (error) {
-              upsertLaunch(fail, {error, state: readRef(state)})
-              throw error
-            }
+          fn(newValue, {handler, state, trigger}) {
+            const result = handler(
+              readRef(state),
+              newValue,
+              getDisplayName(trigger),
+            )
+            if (result === undefined) return
+            return writeRef(state, result)
           },
+          fail(error, {state, fail}) {
+            upsertLaunch(fail, {error, state: readRef(state)})
+          }
         }),
       ],
       meta: {
@@ -121,35 +120,28 @@ export function subscribe(storeInstance: ThisStore, listener: Function) {
     'Expected the listener to be a function',
   )
   let stopPhaseTimerMessage = 'Got initial error'
-  let lastCall = getState(storeInstance)
+  const scope = {
+    lastCall: getState(storeInstance),
+    nodeInstance: storeInstance,
+    handler: listener,
+    name: 'subscribe',
+  }
 
   startPhaseTimer(storeInstance, 'subscribe')
   try {
-    listener(lastCall)
+    listener(scope.lastCall)
     stopPhaseTimerMessage = 'Initial'
   } catch (err) {
     console.error(err)
   }
   stopPhaseTimer(stopPhaseTimerMessage)
   return createLink(storeInstance, {
+    scope,
     node: [
       noop,
-      step.run({
-        fn(args) {
-          let stopPhaseTimerMessage = null
-          startPhaseTimer(storeInstance, 'subscribe')
-          if (args === lastCall) {
-            stopPhaseTimer(stopPhaseTimerMessage)
-            return
-          }
-          lastCall = args
-          try {
-            listener(args)
-          } catch (err) {
-            console.error(err)
-            stopPhaseTimerMessage = 'Got error'
-          }
-          stopPhaseTimer(stopPhaseTimerMessage)
+      runProfile({
+        fn(args, {handler}) {
+          handler(args)
         },
       }),
     ],
@@ -196,26 +188,19 @@ export function mapStore<A, B>(
   createLink(store, {
     child: [innerStore],
     scope: {
-      store,
+      nodeInstance: store,
+      name: 'map',
       handler: fn,
       state: innerStore.stateRef,
       fail: innerStore.fail,
     },
     node: [
-      step.compute({
-        fn(newValue, {state, store, handler, fail}) {
-          startPhaseTimer(store, 'map')
-          let stopPhaseTimerMessage = 'Got error'
-          let result
-          try {
-            result = handler(newValue, readRef(state))
-            stopPhaseTimerMessage = null
-          } catch (error) {
-            fail({error, state: readRef(state)})
-            console.error(error)
-          }
-          stopPhaseTimer(stopPhaseTimerMessage)
-          return result
+      computeProfile({
+        fn(newValue, {state, handler}) {
+          return handler(newValue, readRef(state))
+        },
+        fail(error, {state, fail}) {
+          fail({error, state: readRef(state)})
         },
       }),
       filterChanged,
