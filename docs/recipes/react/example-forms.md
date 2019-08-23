@@ -163,7 +163,7 @@ const Loader = () => {
 }
 
 const SubmitButton = createComponent(sendForm.pending, (props, loading) => (
-  //approach #2: implicit store usage, hooks are unsupported yet
+  //approach #2: implicit store usage
   <button disabled={loading} type="submit">
     Submit
   </button>

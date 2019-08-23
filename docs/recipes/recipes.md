@@ -8,6 +8,7 @@ hide_title: true
 # Recipes
 
 - [Usage with TypeScript](usage-with-typescript.md)
+- [Usage with React](react/example.md)
 - [Usage with React Native](react-native/example.md)
 - Migrating to Effector
   - [From Redux](migrating-to-effector/from-redux.md)
